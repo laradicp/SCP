@@ -1,5 +1,4 @@
 #include "Data.h"
-#include "Heuristic.h"
 #include <ilcplex/ilocplex.h>
 
 bool solve(Data &data, int positions, std::vector<int> &s, std::chrono::duration<double> time)
@@ -481,11 +480,37 @@ int main(int argc, char** argv)
     
     Data data(argv[1]);
     std::vector<int> s;
+    std::ifstream heuristic;
 
-    auto begin = std::chrono::system_clock::now();
+    std::string instance = argv[1];
+    heuristic.open("../heuristic/output/" + instance.substr(13));
+
+    if(!heuristic.is_open())
+    {
+        std::cout << "Problem opening heuristic file for reading." << std::endl;
+        exit(1);
+    }
+
+    int heuristicTime;
+    heuristic >> heuristicTime;
+    
+    while(1)
+    {
+        int i;
+        heuristic >> i;
+
+        if(heuristic.eof())
+        {
+            break;
+        }
+        
+        s.push_back(i);
+    }
+
+    auto begin = heuristicTime + std::chrono::system_clock::now();
     std::chrono::duration<double> time = std::chrono::system_clock::now() - begin;
     
-    int lb = heuristic(data, s);
+    int lb = s.size();
     int ub = data.getDimension();
     
     std::cout << "start binary search" << std::endl;
