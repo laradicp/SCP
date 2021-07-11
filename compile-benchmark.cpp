@@ -6,7 +6,7 @@
 
 void getDual(std::string instanceSet, std::vector<std::pair<double, int>> &dual)
 {
-    std::string filepath = "obj/obj-dual" + instanceSet;
+    std::string filepath = "objval/objval-dual" + instanceSet;
     std::ifstream file, dimensionfile;
     std::vector<int> dimensions;
 
@@ -59,9 +59,9 @@ void getDual(std::string instanceSet, std::vector<std::pair<double, int>> &dual)
 
 void getMatrixObjTimeSet(std::string instanceSet, std::vector<std::vector<std::pair<double, int>>> &matrixObjTimeSet)
 {
-    std::string objfilepath = "obj/obj-" + instanceSet;
+    std::string objvalfilepath = "objval/objval-" + instanceSet;
     std::string timefilepath = "time/time-" + instanceSet;
-    std::ifstream objfile, timefile, dimensionfile;
+    std::ifstream objvalfile, timefile, dimensionfile;
     std::vector<int> dimensions;
 
     dimensionfile.open("instances-dimension");
@@ -85,30 +85,30 @@ void getMatrixObjTimeSet(std::string instanceSet, std::vector<std::vector<std::p
         }
     }
 
-    objfile.open(objfilepath);
+    objvalfile.open(objvalfilepath);
 
-    if(!objfile.is_open())
+    if(!objvalfile.is_open())
     {
-        std::cout << "Problem opening obj file for reading." << std::endl;
+        std::cout << "Problem opening objval file for reading." << std::endl;
         exit(1);
     }
 
     std::string line;
-    std::getline(objfile, line, ':');
+    std::getline(objvalfile, line, ':');
 
     int i = 0;
     while(1)
     {
-        std::getline(objfile, line, ':');
+        std::getline(objvalfile, line, ':');
         matrixObjTimeSet[0].push_back(std::make_pair(std::stod(line), dimensions[i++]));
 
-        if(objfile.eof())
+        if(objvalfile.eof())
         {
             break;
         }
     }
 
-    objfile.close();
+    objvalfile.close();
 
     timefile.open(timefilepath);
 

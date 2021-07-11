@@ -1,60 +1,60 @@
 #!/bin/bash
 
 
-grep 'Maximum profit' ./binary-algo-lb-algo-ub/benchmark/D/bm >> obj/obj-balauD
-grep 'Maximum profit' ./binary-algo-lb-algo-ub/benchmark/C/bm >> obj/obj-balauC
-grep 'Maximum profit' ./binary-algo-lb-algo-ub/benchmark/B/bm >> obj/obj-balauB
-grep 'Maximum profit' ./binary-algo-lb-algo-ub/benchmark/A/bm >> obj/obj-balauA
+grep 'Maximum profit' ./binary-algo-lb-algo-ub/benchmark/D/bm >> objval/objval-balauD
+grep 'Maximum profit' ./binary-algo-lb-algo-ub/benchmark/C/bm >> objval/objval-balauC
+grep 'Maximum profit' ./binary-algo-lb-algo-ub/benchmark/B/bm >> objval/objval-balauB
+grep 'Maximum profit' ./binary-algo-lb-algo-ub/benchmark/A/bm >> objval/objval-balauA
 
-grep 'Maximum profit' ./binary-algo-lb-trivial-ub/benchmark/D/bm >> obj/obj-baltuD
-grep 'Maximum profit' ./binary-algo-lb-trivial-ub/benchmark/C/bm >> obj/obj-baltuC
-grep 'Maximum profit' ./binary-algo-lb-trivial-ub/benchmark/B/bm >> obj/obj-baltuB
-grep 'Maximum profit' ./binary-algo-lb-trivial-ub/benchmark/A/bm >> obj/obj-baltuA
+grep 'Maximum profit' ./binary-algo-lb-trivial-ub/benchmark/D/bm >> objval/objval-baltuD
+grep 'Maximum profit' ./binary-algo-lb-trivial-ub/benchmark/C/bm >> objval/objval-baltuC
+grep 'Maximum profit' ./binary-algo-lb-trivial-ub/benchmark/B/bm >> objval/objval-baltuB
+grep 'Maximum profit' ./binary-algo-lb-trivial-ub/benchmark/A/bm >> objval/objval-baltuA
 
-grep 'Maximum profit' ./binary-heuristic-lb-algo-ub/benchmark/D/bm >> obj/obj-bhlauD
-grep 'Maximum profit' ./binary-heuristic-lb-algo-ub/benchmark/C/bm >> obj/obj-bhlauC
-grep 'Maximum profit' ./binary-heuristic-lb-algo-ub/benchmark/B/bm >> obj/obj-bhlauB
-grep 'Maximum profit' ./binary-heuristic-lb-algo-ub/benchmark/A/bm >> obj/obj-bhlauA
+grep 'Maximum profit' ./binary-heuristic-lb-algo-ub/benchmark/D/bm >> objval/objval-bhlauD
+grep 'Maximum profit' ./binary-heuristic-lb-algo-ub/benchmark/C/bm >> objval/objval-bhlauC
+grep 'Maximum profit' ./binary-heuristic-lb-algo-ub/benchmark/B/bm >> objval/objval-bhlauB
+grep 'Maximum profit' ./binary-heuristic-lb-algo-ub/benchmark/A/bm >> objval/objval-bhlauA
 
-grep 'Maximum profit' ./binary-heuristic-lb-trivial-ub/benchmark/D/bm >> obj/obj-bhltuD
-grep 'Maximum profit' ./binary-heuristic-lb-trivial-ub/benchmark/C/bm >> obj/obj-bhltuC
-grep 'Maximum profit' ./binary-heuristic-lb-trivial-ub/benchmark/B/bm >> obj/obj-bhltuB
-grep 'Maximum profit' ./binary-heuristic-lb-trivial-ub/benchmark/A/bm >> obj/obj-bhltuA
+grep 'Maximum profit' ./binary-heuristic-lb-trivial-ub/benchmark/D/bm >> objval/objval-bhltuD
+grep 'Maximum profit' ./binary-heuristic-lb-trivial-ub/benchmark/C/bm >> objval/objval-bhltuC
+grep 'Maximum profit' ./binary-heuristic-lb-trivial-ub/benchmark/B/bm >> objval/objval-bhltuB
+grep 'Maximum profit' ./binary-heuristic-lb-trivial-ub/benchmark/A/bm >> objval/objval-bhltuA
 
-grep 'Maximum profit' ./binary-trivial-lb-algo-ub/benchmark/D/bm >> obj/obj-btlauD
-grep 'Maximum profit' ./binary-trivial-lb-algo-ub/benchmark/C/bm >> obj/obj-btlauC
-grep 'Maximum profit' ./binary-trivial-lb-algo-ub/benchmark/B/bm >> obj/obj-btlauB
-grep 'Maximum profit' ./binary-trivial-lb-algo-ub/benchmark/A/bm >> obj/obj-btlauA
+grep 'Maximum profit' ./binary-trivial-lb-algo-ub/benchmark/D/bm >> objval/objval-btlauD
+grep 'Maximum profit' ./binary-trivial-lb-algo-ub/benchmark/C/bm >> objval/objval-btlauC
+grep 'Maximum profit' ./binary-trivial-lb-algo-ub/benchmark/B/bm >> objval/objval-btlauB
+grep 'Maximum profit' ./binary-trivial-lb-algo-ub/benchmark/A/bm >> objval/objval-btlauA
 
-grep 'Maximum profit' ./binary-trivial-lb-trivial-ub/benchmark/D/bm >> obj/obj-btltuD
-grep 'Maximum profit' ./binary-trivial-lb-trivial-ub/benchmark/C/bm >> obj/obj-btltuC
-grep 'Maximum profit' ./binary-trivial-lb-trivial-ub/benchmark/B/bm >> obj/obj-btltuB
-grep 'Maximum profit' ./binary-trivial-lb-trivial-ub/benchmark/A/bm >> obj/obj-btltuA
+grep 'Maximum profit' ./binary-trivial-lb-trivial-ub/benchmark/D/bm >> objval/objval-btltuD
+grep 'Maximum profit' ./binary-trivial-lb-trivial-ub/benchmark/C/bm >> objval/objval-btltuC
+grep 'Maximum profit' ./binary-trivial-lb-trivial-ub/benchmark/B/bm >> objval/objval-btltuB
+grep 'Maximum profit' ./binary-trivial-lb-trivial-ub/benchmark/A/bm >> objval/objval-btltuA
 
-grep 'Maximum profit' ./iterative-algo-ub/benchmark/D/bm >> obj/obj-iauD
-grep 'Maximum profit' ./iterative-algo-ub/benchmark/C/bm >> obj/obj-iauC
-grep 'Maximum profit' ./iterative-algo-ub/benchmark/B/bm >> obj/obj-iauB
-grep 'Maximum profit' ./iterative-algo-ub/benchmark/A/bm >> obj/obj-iauA
+grep 'Maximum profit' ./iterative-algo-ub/benchmark/D/bm >> objval/objval-iauD
+grep 'Maximum profit' ./iterative-algo-ub/benchmark/C/bm >> objval/objval-iauC
+grep 'Maximum profit' ./iterative-algo-ub/benchmark/B/bm >> objval/objval-iauB
+grep 'Maximum profit' ./iterative-algo-ub/benchmark/A/bm >> objval/objval-iauA
 
-grep 'Maximum profit' ./iterative-heuristic-lb/benchmark/D/bm >> obj/obj-ihlD
-grep 'Maximum profit' ./iterative-heuristic-lb/benchmark/C/bm >> obj/obj-ihlC
-grep 'Maximum profit' ./iterative-heuristic-lb/benchmark/B/bm >> obj/obj-ihlB
-grep 'Maximum profit' ./iterative-heuristic-lb/benchmark/A/bm >> obj/obj-ihlA
+grep 'Maximum profit' ./iterative-heuristic-lb/benchmark/D/bm >> objval/objval-ihlD
+grep 'Maximum profit' ./iterative-heuristic-lb/benchmark/C/bm >> objval/objval-ihlC
+grep 'Maximum profit' ./iterative-heuristic-lb/benchmark/B/bm >> objval/objval-ihlB
+grep 'Maximum profit' ./iterative-heuristic-lb/benchmark/A/bm >> objval/objval-ihlA
 
-grep 'Maximum profit' ./iterative-trivial-lb/benchmark/D/bm >> obj/obj-itlD
-grep 'Maximum profit' ./iterative-trivial-lb/benchmark/C/bm >> obj/obj-itlC
-grep 'Maximum profit' ./iterative-trivial-lb/benchmark/B/bm >> obj/obj-itlB
-grep 'Maximum profit' ./iterative-trivial-lb/benchmark/A/bm >> obj/obj-itlA
+grep 'Maximum profit' ./iterative-trivial-lb/benchmark/D/bm >> objval/objval-itlD
+grep 'Maximum profit' ./iterative-trivial-lb/benchmark/C/bm >> objval/objval-itlC
+grep 'Maximum profit' ./iterative-trivial-lb/benchmark/B/bm >> objval/objval-itlB
+grep 'Maximum profit' ./iterative-trivial-lb/benchmark/A/bm >> objval/objval-itlA
 
-grep 'Maximum profit' ./iterative-trivial-ub/benchmark/D/bm >> obj/obj-ituD
-grep 'Maximum profit' ./iterative-trivial-ub/benchmark/C/bm >> obj/obj-ituC
-grep 'Maximum profit' ./iterative-trivial-ub/benchmark/B/bm >> obj/obj-ituB
-grep 'Maximum profit' ./iterative-trivial-ub/benchmark/A/bm >> obj/obj-ituA
+grep 'Maximum profit' ./iterative-trivial-ub/benchmark/D/bm >> objval/objval-ituD
+grep 'Maximum profit' ./iterative-trivial-ub/benchmark/C/bm >> objval/objval-ituC
+grep 'Maximum profit' ./iterative-trivial-ub/benchmark/B/bm >> objval/objval-ituB
+grep 'Maximum profit' ./iterative-trivial-ub/benchmark/A/bm >> objval/objval-ituA
 
-grep 'Maximum profit' ./pure/benchmark/D/bm >> obj/obj-pureD
-grep 'Maximum profit' ./pure/benchmark/C/bm >> obj/obj-pureC
-grep 'Maximum profit' ./pure/benchmark/B/bm >> obj/obj-pureB
-grep 'Maximum profit' ./pure/benchmark/A/bm >> obj/obj-pureA
+grep 'Maximum profit' ./pure/benchmark/D/bm >> objval/objval-pureD
+grep 'Maximum profit' ./pure/benchmark/C/bm >> objval/objval-pureC
+grep 'Maximum profit' ./pure/benchmark/B/bm >> objval/objval-pureB
+grep 'Maximum profit' ./pure/benchmark/A/bm >> objval/objval-pureA
 
 
 grep 'Time' ./binary-heuristic-lb-algo-ub/benchmark/D/bm >> time/time-bhlauD
