@@ -1,6 +1,11 @@
-#include "Data.h"
-#include "Heuristic.h"
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <algorithm>
+#include <cmath>
+#include <chrono>
 #include <ilcplex/ilocplex.h>
+#include "Data.h"
 
 bool solve(Data &data, int positions, std::vector<int> &s, std::chrono::duration<double> time)
 {
