@@ -1,5 +1,13 @@
-#include "Data.h"
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <algorithm>
+#include <cmath>
+#include <string>
+#include <chrono>
+#include <unistd.h>
 #include <ilcplex/ilocplex.h>
+#include "Data.h"
 
 bool solve(Data &data, int positions, std::vector<int> &s, std::chrono::duration<double> time)
 {
@@ -491,7 +499,7 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    int heuristicTime;
+    double heuristicTime;
     heuristic >> heuristicTime;
     
     while(1)
@@ -507,7 +515,8 @@ int main(int argc, char** argv)
         s.push_back(i);
     }
 
-    auto begin = heuristicTime + std::chrono::system_clock::now();
+    auto begin = std::chrono::system_clock::now();
+    sleep(heuristicTime);
     std::chrono::duration<double> time = std::chrono::system_clock::now() - begin;
     
     int lb = s.size();
