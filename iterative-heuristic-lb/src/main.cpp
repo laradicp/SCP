@@ -5,11 +5,10 @@
 #include <cmath>
 #include <string>
 #include <chrono>
-#include <unistd.h>
 #include <ilcplex/ilocplex.h>
 #include "Data.h"
 
-bool solve(Data &data, int positions, std::vector<int> &s, std::chrono::duration<double> time)
+bool solve(Data &data, int positions, std::vector<int> &s, double time)
 {
     IloEnv env;
     IloModel model(env);
@@ -186,7 +185,7 @@ bool solve(Data &data, int positions, std::vector<int> &s, std::chrono::duration
     // solve the model
     IloCplex scp(model);
     scp.setOut(env.getNullStream());
-    scp.setParam(IloCplex::Param::TimeLimit, 10*60 - time.count());
+    scp.setParam(IloCplex::Param::TimeLimit, 10*60 - time);
     scp.setParam(IloCplex::Param::Threads, 1);
     scp.setParam(IloCplex::Param::MIP::Strategy::VariableSelect, 3);
     // bpp.setParam(IloCplex::Param::MIP::Interval, 1);
@@ -516,17 +515,16 @@ int main(int argc, char** argv)
     }
 
     auto begin = std::chrono::system_clock::now();
-    sleep(heuristicTime);
     std::chrono::duration<double> time = std::chrono::system_clock::now() - begin;
     
     int lb = s.size();
     
     std::cout << "start iterative search (increment)" << std::endl;
     std::cout << "\tlb: " << ++lb << std::endl;
-    while(solve(data, lb, s, time))
+    while(solve(data, lb, s, time.count() + heuristicTime))
     {
         time = std::chrono::system_clock::now() - begin;
-        if(time.count() > 600)
+        if(time.count() + heuristicTime > 600)
         {
             break;
         }
@@ -546,7 +544,7 @@ int main(int argc, char** argv)
         std::cout << s[p] << std::endl;
     }
     std::cout << "Maximum profit:\t" << lb << std::endl;
-    std::cout << "Time:\t\t" << time.count() << std::endl;
+    std::cout << "Time:\t\t" << time.count() + heuristicTime << std::endl;
 
     return 0;
 }
