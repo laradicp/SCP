@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
+#include <iomanip>
 
 void getDual(std::string instanceSet, std::vector<std::pair<double, int>> &dual)
 {
@@ -287,8 +288,7 @@ int main()
                 }
                 else if(i < 11)
                 {
-                    // denominator: matrixObjTime[i][j][0][l].first or primal[j][l]?
-                    gap = 100*(matrixObjTime[i][j][0][l].first - primal[j][l])/(float)matrixObjTime[i][j][0][l].first;
+                    gap = 100*(matrixObjTime[i][j][0][l].first - primal[j][l])/primal[j][l];
 
                     if(matrixObjTime[i][j][1][l].first < 600)
                     {
@@ -297,7 +297,7 @@ int main()
                 }
                 else
                 {
-                    gap = 100*(dualPure[j][l].first - primal[j][l])/dualPure[j][l].first;
+                    gap = 100*(dualPure[j][l].first - primal[j][l])/primal[j][l];
 
                     if(matrixObjTime[i][j][0][l].first > 0)
                     {
@@ -350,48 +350,59 @@ int main()
             exit(1);
         }
 
-        tablefile << "\t#primal\t#optimal\tlowest gap\toutput\tgap\ttime (solved)\ttime (optimal)" << std::endl;
+        tablefile << "\\hline" << std::endl;
+
+        tablefile << "\t&\t#primal\t&\t#optimal" <<
+        // "\t&\tlowest gap" <<
+        "\t&\toutput\t&\tgap\t&\tT\t&\tT$_\\text{p}$ (s)\\\\" << std::endl;
+
+        tablefile << "\\hline" << std::endl;
         
+        tablefile << std::fixed;
+        tablefile << std::setprecision(2);
+
         for(int i = 0; i < 12; i++)
         {
-            tablefile << versions[i] << "\t";
+            tablefile << versions[i] << "\t&\t";
             
             // #primal
-            tablefile << solved[i][j] << "\t";
+            tablefile << solved[i][j] << "\t&\t";
 
             // #optimal
-            tablefile << optimal[i][j] << "\t";
+            tablefile << optimal[i][j] << "\t&\t";
 
             // lowest gap
-            int noOfLowestGaps = 0;
-            for(int l = 0; l < noOfInstances; l++)
-            {
-                if(gaps[i][j][l] == lowestGap[j][l])
-                {
-                    noOfLowestGaps++;
-                }
-            }
-            tablefile << noOfLowestGaps << "\t";
+            // int noOfLowestGaps = 0;
+            // for(int l = 0; l < noOfInstances; l++)
+            // {
+            //     if(gaps[i][j][l] == lowestGap[j][l])
+            //     {
+            //         noOfLowestGaps++;
+            //     }
+            // }
+            // tablefile << noOfLowestGaps << "\t&\t";
 
             // output
             if(i < 9)
             {
-                tablefile << "primal\t";
+                tablefile << "primal\t&\t";
             }
             else
             {
-                tablefile << "dual\t";
+                tablefile << "dual\t&\t";
             }
 
             // gap
-            tablefile << gapSum[i][j]/solved[i][j] << "\t";
+            tablefile << gapSum[i][j]/noOfInstances << "\t&\t";
 
             // time (solved)
-            tablefile << timeSum[i][j]/solved[i][j] << "\t";
+            tablefile << timeSum[i][j]/noOfInstances << "\t&\t";
 
             // time (optimal)
-            tablefile << timeOptSum[i][j]/optimal[i][j] << std::endl;
+            tablefile << timeOptSum[i][j]/optimal[i][j] << "\\\\" << std::endl;
         }
+
+        tablefile << "\\hline" << std::endl;
 
         tablefile.close();
     }
