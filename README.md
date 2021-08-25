@@ -1,5 +1,4 @@
-# SCP
-Scheduling with cadence constraints problem
+# Scheduling with Cadences
 
 ### Description
 
