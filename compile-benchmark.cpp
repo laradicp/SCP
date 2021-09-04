@@ -352,8 +352,7 @@ int main()
 
         tablefile << "\\hline" << std::endl;
 
-        tablefile << "\t&\t#primal\t&\t#optimal" <<
-        // "\t&\tlowest gap" <<
+        tablefile << "\t&\t#primal\t&\t#optimal" << "\t&\tlowest gap" <<
         "\t&\toutput\t&\tgap\t&\tT\t&\tT$_\\text{p}$ (s)\\\\" << std::endl;
 
         tablefile << "\\hline" << std::endl;
@@ -372,15 +371,15 @@ int main()
             tablefile << optimal[i][j] << "\t&\t";
 
             // lowest gap
-            // int noOfLowestGaps = 0;
-            // for(int l = 0; l < noOfInstances; l++)
-            // {
-            //     if(gaps[i][j][l] == lowestGap[j][l])
-            //     {
-            //         noOfLowestGaps++;
-            //     }
-            // }
-            // tablefile << noOfLowestGaps << "\t&\t";
+            int noOfLowestGaps = 0;
+            for(int l = 0; l < noOfInstances; l++)
+            {
+                if(gaps[i][j][l] == lowestGap[j][l])
+                {
+                    noOfLowestGaps++;
+                }
+            }
+            tablefile << noOfLowestGaps << "\t&\t";
 
             // output
             if(i < 9)
