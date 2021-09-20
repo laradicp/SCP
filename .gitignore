@@ -1,5 +1,9 @@
-bm*
+*.o
+*.d
+
 run*
+ir-ils-table*
+perturb-table*
 
 .vscode/
 
@@ -7,6 +11,8 @@ graphs/
 tables/
 objval/
 time/
+output/
+benchmark/
 
 compile-benchmark
 compile-heuristic-calibration
