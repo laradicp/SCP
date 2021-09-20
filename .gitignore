@@ -1,0 +1,13 @@
+bm*
+run*
+
+.vscode/
+
+graphs/
+tables/
+objval/
+time/
+
+compile-benchmark
+compile-heuristic-calibration
+scp-heuristic
