@@ -35,14 +35,18 @@ Data::Data(std::string filePath)
             break;
         }
 
-        std::vector<bool> cadencesPerJob;
+        std::vector<std::pair<std::pair<int, int>, bool>> cadencesPerJob;
+        // cadencesPerJob[c].first = original cadence
+        // cadencesPerJob[c].second = job has the cadence (1) or not (0)
         bool cadencePerJob;
 
         for(int c = 0; c < cadencesSize; c++)
         {
             in >> cadencePerJob;
-            cadencesPerJob.push_back(cadencePerJob);
+            cadencesPerJob.push_back(std::make_pair(cadences[c], cadencePerJob));
         }
+
+        std::sort(cadencesPerJob.begin(), cadencesPerJob.end(), compareCadencePairs);
 
         bool none = true;
         for(int f = 0; f < familiesSize; f++)
@@ -51,7 +55,7 @@ Data::Data(std::string filePath)
             
             for(int c = 0; c < cadencesSize; c++)
             {
-                if(cadencesPerJob[c] != getCadencesPerFamily(f, c))
+                if(cadencesPerJob[c].second != getCadencesPerFamily(f, c))
                 {
                     equal = false;
 
@@ -73,7 +77,11 @@ Data::Data(std::string filePath)
         if(none)
         {
             std::pair<std::vector<bool>, std::vector<int>> newFamily;
-            newFamily.first = cadencesPerJob;
+            
+            for(int c = 0; c < cadencesSize; c++)
+            {
+                newFamily.first.push_back(cadencesPerJob[c].second);
+            }
             newFamily.second.push_back(version);
 
             familiesSize++;
@@ -88,6 +96,7 @@ Data::Data(std::string filePath)
         }
     }
 
+    std::sort(cadences.begin(), cadences.end(), compareCadences);
     dimension = i;
 
     in.close();
@@ -116,6 +125,31 @@ int Data::getCadence(int c)
     }
 
     return cadences[c].first;
+}
+
+bool Data::compareCadencePairs(std::pair<std::pair<int, int>, bool> p1, std::pair<std::pair<int, int>, bool> p2)
+{
+    return compareCadences(p1.first, p2.first);
+}
+
+bool Data::compareCadences(std::pair<int, int> c1, std::pair<int, int> c2)
+{
+    if(c1.first > 1)
+    {
+        if(c2.first > 1)
+        {
+            return c1.first > c2.first;
+        }
+
+        return true;
+    }
+
+    if(c2.first > 1)
+    {
+        return false;
+    }
+
+    return c1.second < c2.second;
 }
 
 int Data::getFamilyMember(int f, int i)
@@ -195,22 +229,17 @@ int Data::getUpperBound()
     return ub;
 }
 
-int Data::unused(int j, int i, std::vector<double> &score, std::vector<int> &jobsPerScore, std::vector<std::vector<int>> &intersection)
+int Data::used(int j, int i, std::vector<double> &score, std::vector<int> &jobsPerScore, std::vector<std::vector<int>> &intersection)
 {
-    if(j == 0)
+    int fittingJobs = ceil(calculateLB(i - 1, score, jobsPerScore, intersection)/score[i]);
+    if(j == i)
     {
-        return 0;
-    }
-    else if(j == i)
-    {
-        int previousLB = calculateLB(j - 1, score, jobsPerScore, intersection);
-        return std::ceil(1/score[j]*previousLB) - jobsPerScore[j] > 0 ? std::ceil(1/score[j]*previousLB) - jobsPerScore[j] : 0;
+        return fittingJobs < jobsPerScore[i] ? fittingJobs : jobsPerScore[i] ;
     }
     else
     {
-        int previousUnusedJ = unused(j, i - 1, score, jobsPerScore, intersection);
-        int usedInI = previousUnusedJ < intersection[i][j] ? previousUnusedJ : intersection[i][j];
-        return previousUnusedJ - usedInI;
+        int min = fittingJobs < intersection[i][j] ? fittingJobs : intersection[i][j];
+        return used(j, i - 1, score, jobsPerScore, intersection) + min;
     }
 }
 
@@ -222,15 +251,16 @@ int Data::calculateLB(int i, std::vector<double> &score, std::vector<int> &jobsP
     }
     else
     {
-        int previousLB = calculateLB(i - 1, score, jobsPerScore, intersection), violations = 0;
-        int maxFit = std::ceil(1/score[i]*previousLB) < jobsPerScore[i] ? std::ceil(1/score[i]*previousLB) : jobsPerScore[i];
-        for(int j = 0; j < i; j++)
+        int previousLB = calculateLB(i - 1, score, jobsPerScore, intersection), 
+            min = ceil(previousLB/score[i]) < jobsPerScore[i] ? ceil(previousLB/score[i]) : jobsPerScore[i],
+            violations = 0;
+        for(int j = 1; j < i; j++)
         {
-            int intersectionMinusUnused = intersection[i][j] - unused(j, i - 1, score, jobsPerScore, intersection);
-            violations += intersectionMinusUnused > 0 ? intersectionMinusUnused : 0;
+            int usedPos = used(j, i, score, jobsPerScore, intersection);
+            violations += intersection[i][j] < usedPos ? intersection[i][j] : usedPos;
         }
-        int fit = maxFit - violations > 0 ? maxFit - violations : 0;
-        return previousLB + fit;        
+        int max = min - violations > 0 ? min - violations : 0;
+        return previousLB + max;        
     }
 }
 

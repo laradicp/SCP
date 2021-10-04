@@ -338,6 +338,26 @@ int main()
     std::cout << "mean size: " << sumSize/193.0 << std::endl;
     std::cout << "median: " << median << std::endl;
 
+    // optimals file
+    for(int j = 0; j < 4; j++)
+    {
+        std::ofstream out;
+        out.open("optimals" + instancesSets[j]);
+
+        if(!out.is_open())
+        {
+            std::cout << "Problem opening optimals file for writing." << std::endl;
+            exit(1);
+        }
+
+        for(int l = 0; l < noOfInstances; l++)
+        {
+            out <<  primal[j][l] << std::endl;
+        }
+        
+        out.close();
+    }
+
     // tables
     for(int j = 0; j < 4; j++)
     {
