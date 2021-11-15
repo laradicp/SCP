@@ -1,9 +1,11 @@
 *.o
 *.d
+*.lp
 
 run*
 ir-ils-table*
 perturb-table*
+number-of-families*
 
 .vscode/
 
@@ -17,3 +19,5 @@ benchmark/
 compile-benchmark
 compile-heuristic-calibration
 scp-heuristic
+violations.ods
+
