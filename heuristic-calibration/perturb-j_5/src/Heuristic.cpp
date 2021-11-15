@@ -326,7 +326,7 @@ void perturbation(vector<int> &s, Data &data, vector<int> &perturbationType)
     
     if(perturbationType[i] == 1)
     {
-        int t = sSize/2 < data.getDimension()/20 ? sSize/2 : data.getDimension()/20;
+        int t = sSize/2 < data.getDimension()/5 ? sSize/2 : data.getDimension()/5;
         for(int j = 0; j < t; j++)
         {
             vector<int> feasiblePositions;
@@ -420,10 +420,15 @@ void perturbation(vector<int> &s, Data &data, vector<int> &perturbationType)
             
             feasiblePositions.push_back(sSize - 1);
 
-            int p = rand()%feasiblePositions.size();
-            data.setFamilySize(s[feasiblePositions[p]], data.getFamilySize(s[feasiblePositions[p]]) + 1);
-            s.erase(s.begin() + feasiblePositions[p]);
-            sSize--;
+            int feasiblePositionsSize = feasiblePositions.size();
+
+            if(feasiblePositionsSize)
+            {
+                int p = rand()%feasiblePositionsSize;
+                data.setFamilySize(s[feasiblePositions[p]], data.getFamilySize(s[feasiblePositions[p]]) + 1);
+                s.erase(s.begin() + feasiblePositions[p]);
+                sSize--;
+            }
         }
     }
     else
@@ -598,16 +603,15 @@ void perturbation(vector<int> &s, Data &data, vector<int> &perturbationType)
             feasiblePairs.erase(feasiblePairs.begin() + p);
             feasiblePairsSize--;
 
-            int t = sSize/2 < data.getDimension()/20 ? sSize/2 : data.getDimension()/20;
+            int t = sSize/2 < data.getDimension()/5 ? sSize/2 - 1 : data.getDimension()/5 - 1;
 
-            if(feasiblePairsSize < t - 1)
+            if(feasiblePairsSize < t)
             {
                 t = feasiblePairsSize;
             }
 
             int k = 0;
-            vector<pair<int,int>> pairsStorage;
-            for(int j = 1; j < t; )
+            for(int j = 0; j < t; )
             {
                 vector<int> newS = s;
 
@@ -628,28 +632,10 @@ void perturbation(vector<int> &s, Data &data, vector<int> &perturbationType)
                         k = 0;
                         j++;
                     }
-                    
-                    pairsStorage.push_back(feasiblePairs[p]);
-                    feasiblePairs.erase(feasiblePairs.begin() + p);
-                    feasiblePairsSize--;
-
-                    if(!feasiblePairsSize)
-                    {
-                        break;
-                    }
                 }
                 else
                 {
                     s = newS;
-
-                    int pairsStorageSize = pairsStorage.size();
-                    for(int l = 0; l < pairsStorageSize; l++)
-                    {
-                        feasiblePairs.push_back(pairsStorage[l]);
-                        feasiblePairsSize++;
-                    }
-
-                    pairsStorage.clear();
 
                     feasiblePairs.erase(feasiblePairs.begin() + p);
                     feasiblePairsSize--;
@@ -687,67 +673,55 @@ int heuristic(Data data, vector<int> &bestS)
     Data fullData = data;
     int bestSSize = 0;
 
-    for(int i = 0; i < 5; i++)
+    vector<int> currentBestS;
+    data = fullData;
+
+    construction(currentBestS, data);
+    int currentBestSSize = currentBestS.size();
+    Data currentBestData = data;
+
+    vector<int> perturbationType{1, 1, 2, 2};
+    
+    for(int j = 0; j < data.getDimension()/2; j++)
     {
-        vector<int> currentBestS;
-        data = fullData;
+        vector<int> s = currentBestS;
+        data = currentBestData;
 
-        construction(currentBestS, data);
-        int currentBestSSize = currentBestS.size();
-        Data currentBestData = data;
-
-        vector<int> perturbationType{1, 1, 2, 2};
+        if(s.size() == data.getDimension())
+        {
+            break;
+        }
         
-        for(int j = 0; j < data.getDimension(); j++)
-        {
-            vector<int> s = currentBestS;
-            data = currentBestData;
-
-            if(s.size() == data.getDimension())
-            {
-                break;
-            }
-            
-            perturbation(s, data, perturbationType);
-            
-            if(s.size() == data.getDimension())
-            {
-                break;
-            }
-
-            insertion(s, data);
-            
-            if(s.size() > currentBestSSize)
-            {
-                currentBestS = s;
-                currentBestSSize = s.size();
-                currentBestData = data;
-            
-                j = 0;
-            }
-            else
-            {
-                j++;
-            }
-        }
-
-        if(currentBestSSize > bestSSize)
-        {
-            bestS = currentBestS;
-            bestSSize = currentBestSSize;
-        }
-
-        if(bestSSize == data.getDimension())
+        perturbation(s, data, perturbationType);
+        
+        if(s.size() == data.getDimension())
         {
             break;
         }
 
-        chrono::duration<double> currentTime = chrono::system_clock::now() - beginTime;
-        if(currentTime.count() > 600)
+        insertion(s, data);
+        
+        if(s.size() > currentBestSSize)
         {
-            break;
+            currentBestS = s;
+            currentBestSSize = s.size();
+            currentBestData = data;
+        
+            j = 0;
+        }
+        else
+        {
+            j++;
         }
     }
+
+    if(currentBestSSize > bestSSize)
+    {
+        bestS = currentBestS;
+        bestSSize = currentBestSSize;
+    }
+
+    chrono::duration<double> currentTime = chrono::system_clock::now() - beginTime;
 
     return bestSSize;
 }

@@ -687,67 +687,55 @@ int heuristic(Data data, vector<int> &bestS)
     Data fullData = data;
     int bestSSize = 0;
 
-    for(int i = 0; i < 5; i++)
+    vector<int> currentBestS;
+    data = fullData;
+
+    construction(currentBestS, data);
+    int currentBestSSize = currentBestS.size();
+    Data currentBestData = data;
+
+    vector<int> perturbationType{1, 1, 2, 2};
+    
+    for(int j = 0; j < data.getDimension()/2; j++)
     {
-        vector<int> currentBestS;
-        data = fullData;
+        vector<int> s = currentBestS;
+        data = currentBestData;
 
-        construction(currentBestS, data);
-        int currentBestSSize = currentBestS.size();
-        Data currentBestData = data;
-
-        vector<int> perturbationType{1, 1, 2, 2};
+        if(s.size() == data.getDimension())
+        {
+            break;
+        }
         
-        for(int j = 0; j < data.getDimension(); j++)
-        {
-            vector<int> s = currentBestS;
-            data = currentBestData;
-
-            if(s.size() == data.getDimension())
-            {
-                break;
-            }
-            
-            perturbation(s, data, perturbationType);
-            
-            if(s.size() == data.getDimension())
-            {
-                break;
-            }
-
-            insertion(s, data);
-            
-            if(s.size() > currentBestSSize)
-            {
-                currentBestS = s;
-                currentBestSSize = s.size();
-                currentBestData = data;
-            
-                j = 0;
-            }
-            else
-            {
-                j++;
-            }
-        }
-
-        if(currentBestSSize > bestSSize)
-        {
-            bestS = currentBestS;
-            bestSSize = currentBestSSize;
-        }
-
-        if(bestSSize == data.getDimension())
+        perturbation(s, data, perturbationType);
+        
+        if(s.size() == data.getDimension())
         {
             break;
         }
 
-        chrono::duration<double> currentTime = chrono::system_clock::now() - beginTime;
-        if(currentTime.count() > 600)
+        insertion(s, data);
+        
+        if(s.size() > currentBestSSize)
         {
-            break;
+            currentBestS = s;
+            currentBestSSize = s.size();
+            currentBestData = data;
+        
+            j = 0;
+        }
+        else
+        {
+            j++;
         }
     }
+
+    if(currentBestSSize > bestSSize)
+    {
+        bestS = currentBestS;
+        bestSSize = currentBestSSize;
+    }
+
+    chrono::duration<double> currentTime = chrono::system_clock::now() - beginTime;
 
     return bestSSize;
 }

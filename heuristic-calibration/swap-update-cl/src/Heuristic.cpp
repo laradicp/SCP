@@ -428,240 +428,179 @@ void perturbation(vector<int> &s, Data &data, vector<int> &perturbationType)
     }
     else
     {
-        vector<pair<int, int>> feasiblePairs;
-
-        for(int p1 = 0; p1 < sSize - 1; p1++)
+        int t = sSize/2 < data.getDimension()/20 ? sSize/2 : data.getDimension()/20;
+        for(int j = 0; j < t; j++)
         {
-            for(int p2 = p1 + 1; p2 < sSize; p2++)
+            vector<pair<int, int>> feasiblePairs;
+
+            for(int p1 = 0; p1 < sSize - 1; p1++)
             {
-                bool feasiblePair = true;
-
-                for(int c = 0; c < data.getCadencesSize(); c++)
+                for(int p2 = p1 + 1; p2 < sSize; p2++)
                 {
-                    if(data.getCadencesPerFamily(s[p1], c))
+                    bool feasiblePair = true;
+
+                    for(int c = 0; c < data.getCadencesSize(); c++)
                     {
-                        int begin = p2 - data.getCadence(c) > 0 ? p2 - data.getCadence(c) : 0;
-                        int end = p2 + data.getCadence(c) + 1 < sSize ? p2 + data.getCadence(c) + 1 : sSize;
-
-                        if(data.cadenceType(c) == 1)
+                        if(data.getCadencesPerFamily(s[p1], c))
                         {
-                            for(int k = begin; k < p2; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    feasiblePair = false;
-                                    break;
-                                }
-                            }
+                            int begin = p2 - data.getCadence(c) > 0 ? p2 - data.getCadence(c) : 0;
+                            int end = p2 + data.getCadence(c) + 1 < sSize ? p2 + data.getCadence(c) + 1 : sSize;
 
-                            for(int k = p2 + 1; k < end; k++)
+                            if(data.cadenceType(c) == 1)
                             {
-                                if(data.getCadencesPerFamily(s[k], c))
+                                for(int k = begin; k < p2; k++)
                                 {
-                                    feasiblePair = false;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {    
-                            int sum = 0;
-
-                            for(int k = begin; k < p2; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-                                }
-                                else
-                                {
-                                    sum = 0; 
-                                }
-                            }
-
-                            sum++;
-                            
-                            if(sum > data.getCadence(c))
-                            {
-                                feasiblePair = false;
-                                break;
-                            }
-
-                            for(int k = p2 + 1; k < end; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-
-                                    if(sum > data.getCadence(c))
+                                    if(data.getCadencesPerFamily(s[k], c))
                                     {
                                         feasiblePair = false;
                                         break;
                                     }
                                 }
-                                else
+
+                                for(int k = p2 + 1; k < end; k++)
                                 {
-                                    sum = 0; 
-                                }
-                            }
-                        }
-                    }
-
-                    if(data.getCadencesPerFamily(s[p2], c))
-                    {
-                        int begin = p1 - data.getCadence(c) > 0 ? p1 - data.getCadence(c) : 0;
-                        int end = p1 + data.getCadence(c) + 1 < sSize ? p1 + data.getCadence(c) + 1 : sSize;
-
-                        if(data.cadenceType(c) == 1)
-                        {
-                            for(int k = begin; k < p1; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    feasiblePair = false;
-                                    break;
-                                }
-                            }
-
-                            for(int k = p1 + 1; k < end; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    feasiblePair = false;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {    
-                            int sum = 0;
-
-                            for(int k = begin; k < p1; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-                                }
-                                else
-                                {
-                                    sum = 0; 
-                                }
-                            }
-
-                            sum++;
-                            
-                            if(sum > data.getCadence(c))
-                            {
-                                feasiblePair = false;
-                                break;
-                            }
-
-                            for(int k = p1 + 1; k < end; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-
-                                    if(sum > data.getCadence(c))
+                                    if(data.getCadencesPerFamily(s[k], c))
                                     {
                                         feasiblePair = false;
                                         break;
                                     }
                                 }
-                                else
+                            }
+                            else
+                            {    
+                                int sum = 0;
+
+                                for(int k = begin; k < p2; k++)
                                 {
-                                    sum = 0; 
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        sum++;
+                                    }
+                                    else
+                                    {
+                                        sum = 0; 
+                                    }
+                                }
+
+                                sum++;
+                                
+                                if(sum > data.getCadence(c))
+                                {
+                                    feasiblePair = false;
+                                    break;
+                                }
+
+                                for(int k = p2 + 1; k < end; k++)
+                                {
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        sum++;
+
+                                        if(sum > data.getCadence(c))
+                                        {
+                                            feasiblePair = false;
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        sum = 0; 
+                                    }
+                                }
+                            }
+                        }
+
+                        if(data.getCadencesPerFamily(s[p2], c))
+                        {
+                            int begin = p1 - data.getCadence(c) > 0 ? p1 - data.getCadence(c) : 0;
+                            int end = p1 + data.getCadence(c) + 1 < sSize ? p1 + data.getCadence(c) + 1 : sSize;
+
+                            if(data.cadenceType(c) == 1)
+                            {
+                                for(int k = begin; k < p1; k++)
+                                {
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        feasiblePair = false;
+                                        break;
+                                    }
+                                }
+
+                                for(int k = p1 + 1; k < end; k++)
+                                {
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        feasiblePair = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {    
+                                int sum = 0;
+
+                                for(int k = begin; k < p1; k++)
+                                {
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        sum++;
+                                    }
+                                    else
+                                    {
+                                        sum = 0; 
+                                    }
+                                }
+
+                                sum++;
+                                
+                                if(sum > data.getCadence(c))
+                                {
+                                    feasiblePair = false;
+                                    break;
+                                }
+
+                                for(int k = p1 + 1; k < end; k++)
+                                {
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        sum++;
+
+                                        if(sum > data.getCadence(c))
+                                        {
+                                            feasiblePair = false;
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        sum = 0; 
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                if(feasiblePair)
-                {
-                    pair<int, int> p = {p1, p2};
-                    feasiblePairs.push_back(p);
+                    if(feasiblePair)
+                    {
+                        pair<int, int> p = {p1, p2};
+                        feasiblePairs.push_back(p);
+                    }
                 }
             }
-        }
 
-        int feasiblePairsSize = feasiblePairs.size();
-        if(feasiblePairsSize)
-        {
-            int p = rand()%feasiblePairsSize;
-            s.insert(s.begin() + feasiblePairs[p].second, s[feasiblePairs[p].first]);
-            s.insert(s.begin() + feasiblePairs[p].first, s[feasiblePairs[p].second + 1]);
-
-            s.erase(s.begin() + feasiblePairs[p].first + 1);
-            s.erase(s.begin() + feasiblePairs[p].second + 1);
-
-            feasiblePairs.erase(feasiblePairs.begin() + p);
-            feasiblePairsSize--;
-
-            int t = sSize/2 < data.getDimension()/20 ? sSize/2 : data.getDimension()/20;
-
-            if(feasiblePairsSize < t - 1)
+            int feasiblePairsSize = feasiblePairs.size();
+            if(feasiblePairsSize)
             {
-                t = feasiblePairsSize;
+                int p = rand()%feasiblePairsSize;
+                s.insert(s.begin() + feasiblePairs[p].second, s[feasiblePairs[p].first]);
+                s.insert(s.begin() + feasiblePairs[p].first, s[feasiblePairs[p].second + 1]);
+
+                s.erase(s.begin() + feasiblePairs[p].first + 1);
+                s.erase(s.begin() + feasiblePairs[p].second + 1);
             }
-
-            int k = 0;
-            vector<pair<int,int>> pairsStorage;
-            for(int j = 1; j < t; )
+            else
             {
-                vector<int> newS = s;
-
-                p = rand()%feasiblePairsSize;
-
-                newS.insert(newS.begin() + feasiblePairs[p].second, newS[feasiblePairs[p].first]);
-                newS.insert(newS.begin() + feasiblePairs[p].first, newS[feasiblePairs[p].second + 1]);
-
-                newS.erase(newS.begin() + feasiblePairs[p].first + 1);
-                newS.erase(newS.begin() + feasiblePairs[p].second + 1);
-
-                if(isInfeasible(newS, data))
-                {
-                    k++;
-
-                    if(k > 4)
-                    {
-                        k = 0;
-                        j++;
-                    }
-                    
-                    pairsStorage.push_back(feasiblePairs[p]);
-                    feasiblePairs.erase(feasiblePairs.begin() + p);
-                    feasiblePairsSize--;
-
-                    if(!feasiblePairsSize)
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    s = newS;
-
-                    int pairsStorageSize = pairsStorage.size();
-                    for(int l = 0; l < pairsStorageSize; l++)
-                    {
-                        feasiblePairs.push_back(pairsStorage[l]);
-                        feasiblePairsSize++;
-                    }
-
-                    pairsStorage.clear();
-
-                    feasiblePairs.erase(feasiblePairs.begin() + p);
-                    feasiblePairsSize--;
-
-                    if(!feasiblePairsSize)
-                    {
-                        break;
-                    }
-
-                    k = 0;
-                    j++;
-                }
+                break;
             }
         }
     }
@@ -687,67 +626,55 @@ int heuristic(Data data, vector<int> &bestS)
     Data fullData = data;
     int bestSSize = 0;
 
-    for(int i = 0; i < 5; i++)
+    vector<int> currentBestS;
+    data = fullData;
+
+    construction(currentBestS, data);
+    int currentBestSSize = currentBestS.size();
+    Data currentBestData = data;
+
+    vector<int> perturbationType{1, 1, 2, 2};
+    
+    for(int j = 0; j < data.getDimension()/2; j++)
     {
-        vector<int> currentBestS;
-        data = fullData;
+        vector<int> s = currentBestS;
+        data = currentBestData;
 
-        construction(currentBestS, data);
-        int currentBestSSize = currentBestS.size();
-        Data currentBestData = data;
-
-        vector<int> perturbationType{1, 1, 2, 2};
+        if(s.size() == data.getDimension())
+        {
+            break;
+        }
         
-        for(int j = 0; j < data.getDimension(); j++)
-        {
-            vector<int> s = currentBestS;
-            data = currentBestData;
-
-            if(s.size() == data.getDimension())
-            {
-                break;
-            }
-            
-            perturbation(s, data, perturbationType);
-            
-            if(s.size() == data.getDimension())
-            {
-                break;
-            }
-
-            insertion(s, data);
-            
-            if(s.size() > currentBestSSize)
-            {
-                currentBestS = s;
-                currentBestSSize = s.size();
-                currentBestData = data;
-            
-                j = 0;
-            }
-            else
-            {
-                j++;
-            }
-        }
-
-        if(currentBestSSize > bestSSize)
-        {
-            bestS = currentBestS;
-            bestSSize = currentBestSSize;
-        }
-
-        if(bestSSize == data.getDimension())
+        perturbation(s, data, perturbationType);
+        
+        if(s.size() == data.getDimension())
         {
             break;
         }
 
-        chrono::duration<double> currentTime = chrono::system_clock::now() - beginTime;
-        if(currentTime.count() > 600)
+        insertion(s, data);
+        
+        if(s.size() > currentBestSSize)
         {
-            break;
+            currentBestS = s;
+            currentBestSSize = s.size();
+            currentBestData = data;
+        
+            j = 0;
+        }
+        else
+        {
+            j++;
         }
     }
+
+    if(currentBestSSize > bestSSize)
+    {
+        bestS = currentBestS;
+        bestSSize = currentBestSSize;
+    }
+
+    chrono::duration<double> currentTime = chrono::system_clock::now() - beginTime;
 
     return bestSSize;
 }
