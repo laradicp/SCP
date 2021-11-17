@@ -10,58 +10,31 @@ bool isInfeasible(vector<int> &s, Data &data)
     {
         for(int c = 0; c < data.getCadencesSize(); c++)
         {
-            if(data.cadenceType(c) == 1)
+            if(data.getCadencesPerFamily(s[p], c))
             {
-                int sum = 0;
-
-                if(data.getCadencesPerFamily(s[p], c))
+                int sum = 1;
+                int end = p + data.getCadence(c) + 1 < sSize ? p + data.getCadence(c) + 1 : sSize;
+                for(int k = p + 1; k < end; k++)
                 {
-                    for(int k = 0; k < data.getCadence(c) + 1; k++)
+                    if(data.getCadencesPerFamily(s[k], c))
                     {
-                        if(p + k < sSize)
-                        {
-                            if(data.getCadencesPerFamily(s[p + k], c))
-                            {
-                                sum++;
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-                
-                if(sum > 1)
-                {
-                    return true;
-                }
-            }
-            else if(data.cadenceType(c) == 2)
-            {    
-                int sum = 0;
-
-                if(data.getCadencesPerFamily(s[p], c))
-                {
-                    for(int k = 0; k < data.getCadence(c) + 1; k++)
-                    {
-                        if(p + k < sSize)
-                        {
-                            if(data.getCadencesPerFamily(s[p + k], c))
-                            {
-                                sum++;
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        sum++;
                     }
                 }
 
-                if(sum > data.getCadence(c))
+                if(data.cadenceType(c) == 1)
                 {
-                    return true;
+                    if(sum > 1)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if(sum > data.getCadence(c))
+                    {
+                        return true;
+                    }
                 }
             }
         }
@@ -161,7 +134,7 @@ void insertion(vector<int> &s, Data &data)
         {	
             if(data.getFamilySize(f))
             {
-                bool feasibleVersion = true;
+                bool feasibleFamily = true;
 
                 for(int c = 0; c < data.getCadencesSize(); c++)
                 {
@@ -176,7 +149,7 @@ void insertion(vector<int> &s, Data &data)
                             {
                                 if(data.getCadencesPerFamily(s[k], c))
                                 {
-                                    feasibleVersion = false;
+                                    feasibleFamily = false;
                                     break;
                                 }
                             }
@@ -201,7 +174,7 @@ void insertion(vector<int> &s, Data &data)
                             
                             if(sum > data.getCadence(c))
                             {
-                                feasibleVersion = false;
+                                feasibleFamily = false;
                                 break;
                             }
 
@@ -213,7 +186,7 @@ void insertion(vector<int> &s, Data &data)
 
                                     if(sum > data.getCadence(c))
                                     {
-                                        feasibleVersion = false;
+                                        feasibleFamily = false;
                                         break;
                                     }
                                 }
@@ -226,7 +199,7 @@ void insertion(vector<int> &s, Data &data)
                     }
                 }
 
-                if(feasibleVersion)
+                if(feasibleFamily)
                 {
                     s.insert(s.begin() + p, f);
                     sSize++;
@@ -243,7 +216,7 @@ void insertion(vector<int> &s, Data &data)
         {	
             if(data.getFamilySize(f))
             {
-                bool feasibleVersion = true;
+                bool feasibleFamily = true;
 
                 for(int c = 0; c < data.getCadencesSize(); c++)
                 {
@@ -258,7 +231,7 @@ void insertion(vector<int> &s, Data &data)
                             {
                                 if(data.getCadencesPerFamily(s[k], c))
                                 {
-                                    feasibleVersion = false;
+                                    feasibleFamily = false;
                                     break;
                                 }
                             }
@@ -283,7 +256,7 @@ void insertion(vector<int> &s, Data &data)
                             
                             if(sum > data.getCadence(c))
                             {
-                                feasibleVersion = false;
+                                feasibleFamily = false;
                                 break;
                             }
 
@@ -295,7 +268,7 @@ void insertion(vector<int> &s, Data &data)
 
                                     if(sum > data.getCadence(c))
                                     {
-                                        feasibleVersion = false;
+                                        feasibleFamily = false;
                                         break;
                                     }
                                 }
@@ -308,7 +281,7 @@ void insertion(vector<int> &s, Data &data)
                     }
                 }
 
-                if(feasibleVersion)
+                if(feasibleFamily)
                 {
                     s.insert(s.begin() + p, f);
                     sSize++;
@@ -350,25 +323,16 @@ void perturbation(vector<int> &s, Data &data, vector<int> &perturbationType)
                         {
                             if(data.getCadencesPerFamily(s[k], c))
                             {
-                                if(k - lastTrueK < data.getCadence(c) + 1)
-                                {
-                                    feasiblePosition = false;
-                                    break;
-                                }
-                                else
-                                {
-                                    lastTrueK = k;
-                                }
+                                lastTrueK = k;
                             }
                         }
-
-                        lastTrueK++; //because of the position p in the middle
 
                         for(int k = p + 1; k < end; k++)
                         {
                             if(data.getCadencesPerFamily(s[k], c))
                             {
-                                if(k - lastTrueK < data.getCadence(c) + 1)
+                                if(k - lastTrueK - 1 < data.getCadence(c) + 1)
+                                // check if the positions in the middle are less than data.getCadence(1) + 1
                                 {
                                     feasiblePosition = false;
                                     break;
@@ -438,139 +402,169 @@ void perturbation(vector<int> &s, Data &data, vector<int> &perturbationType)
 
                 for(int c = 0; c < data.getCadencesSize(); c++)
                 {
+                    // if both jobs or none have cadence c, there is no need to check feasibility
                     if(data.getCadencesPerFamily(s[p1], c))
                     {
-                        int begin = p2 - data.getCadence(c) > 0 ? p2 - data.getCadence(c) : 0;
-                        int end = p2 + data.getCadence(c) + 1 < sSize ? p2 + data.getCadence(c) + 1 : sSize;
-
-                        if(data.cadenceType(c) == 1)
+                        if(!data.getCadencesPerFamily(s[p2], c))
                         {
-                            for(int k = begin; k < p2; k++)
+                            int begin = p2 - data.getCadence(c) > 0 ? p2 - data.getCadence(c) : 0;
+                            int end = p2 + data.getCadence(c) + 1 < sSize ? p2 + data.getCadence(c) + 1 : sSize;
+
+                            if(data.cadenceType(c) == 1)
                             {
-                                if(data.getCadencesPerFamily(s[k], c))
+                                if(p1 > begin)
                                 {
-                                    feasiblePair = false;
-                                    break;
+                                    begin = p1 + data.getCadence(c) + 1;
+                                    // there is no job with cadence c closer to p1 than data.getCadence(c) positions
                                 }
-                            }
 
-                            for(int k = p2 + 1; k < end; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
+                                for(int k = begin; k < p2; k++)
                                 {
-                                    feasiblePair = false;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {    
-                            int sum = 0;
-
-                            for(int k = begin; k < p2; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-                                }
-                                else
-                                {
-                                    sum = 0; 
-                                }
-                            }
-
-                            sum++;
-                            
-                            if(sum > data.getCadence(c))
-                            {
-                                feasiblePair = false;
-                                break;
-                            }
-
-                            for(int k = p2 + 1; k < end; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-
-                                    if(sum > data.getCadence(c))
+                                    if(data.getCadencesPerFamily(s[k], c))
                                     {
                                         feasiblePair = false;
                                         break;
                                     }
                                 }
-                                else
+
+                                for(int k = p2 + 1; k < end; k++)
                                 {
-                                    sum = 0; 
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        feasiblePair = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if(p1 > begin)
+                                {
+                                    begin = p1 + 1;
+                                    // position p1 will be filled by s[p2], which doesn't have cadence c
+                                }
+
+                                int sum = 0;
+
+                                for(int k = begin; k < p2; k++)
+                                {
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        sum++;
+                                    }
+                                    else
+                                    {
+                                        sum = 0; 
+                                    }
+                                }
+
+                                sum++;
+                                
+                                if(sum > data.getCadence(c))
+                                {
+                                    feasiblePair = false;
+                                    break;
+                                }
+
+                                for(int k = p2 + 1; k < end; k++)
+                                {
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        sum++;
+
+                                        if(sum > data.getCadence(c))
+                                        {
+                                            feasiblePair = false;
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        sum = 0; 
+                                    }
                                 }
                             }
                         }
                     }
-
-                    if(data.getCadencesPerFamily(s[p2], c))
+                    else
                     {
-                        int begin = p1 - data.getCadence(c) > 0 ? p1 - data.getCadence(c) : 0;
-                        int end = p1 + data.getCadence(c) + 1 < sSize ? p1 + data.getCadence(c) + 1 : sSize;
-
-                        if(data.cadenceType(c) == 1)
+                        if(data.getCadencesPerFamily(s[p2], c))
                         {
-                            for(int k = begin; k < p1; k++)
+                            int begin = p1 - data.getCadence(c) > 0 ? p1 - data.getCadence(c) : 0;
+                            int end = p1 + data.getCadence(c) + 1 < sSize ? p1 + data.getCadence(c) + 1 : sSize;
+
+                            if(data.cadenceType(c) == 1)
                             {
-                                if(data.getCadencesPerFamily(s[k], c))
+                                if(p2 < end)
                                 {
-                                    feasiblePair = false;
-                                    break;
+                                    end = p2 - data.getCadence(c);
+                                    // there is no job with cadence c closer to p2 than data.getCadence(c) positions
                                 }
-                            }
 
-                            for(int k = p1 + 1; k < end; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
+                                for(int k = begin; k < p1; k++)
                                 {
-                                    feasiblePair = false;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {    
-                            int sum = 0;
-
-                            for(int k = begin; k < p1; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-                                }
-                                else
-                                {
-                                    sum = 0; 
-                                }
-                            }
-
-                            sum++;
-                            
-                            if(sum > data.getCadence(c))
-                            {
-                                feasiblePair = false;
-                                break;
-                            }
-
-                            for(int k = p1 + 1; k < end; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-
-                                    if(sum > data.getCadence(c))
+                                    if(data.getCadencesPerFamily(s[k], c))
                                     {
                                         feasiblePair = false;
                                         break;
                                     }
                                 }
-                                else
+
+                                for(int k = p1 + 1; k < end; k++)
                                 {
-                                    sum = 0; 
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        feasiblePair = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if(p2 < end)
+                                {
+                                    end = p2;
+                                    // position p2 will be filled by s[p1], which doesn't have cadence c
+                                }
+                                
+                                int sum = 0;
+
+                                for(int k = begin; k < p1; k++)
+                                {
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        sum++;
+                                    }
+                                    else
+                                    {
+                                        sum = 0; 
+                                    }
+                                }
+
+                                sum++;
+                                
+                                if(sum > data.getCadence(c))
+                                {
+                                    feasiblePair = false;
+                                    break;
+                                }
+
+                                for(int k = p1 + 1; k < end; k++)
+                                {
+                                    if(data.getCadencesPerFamily(s[k], c))
+                                    {
+                                        sum++;
+
+                                        if(sum > data.getCadence(c))
+                                        {
+                                            feasiblePair = false;
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        sum = 0; 
+                                    }
                                 }
                             }
                         }

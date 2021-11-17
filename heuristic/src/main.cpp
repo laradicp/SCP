@@ -30,10 +30,11 @@ int main(int argc, char** argv)
     out << time.count() << std::endl;
 
     int sSize = s.size();
-    std::vector<int> iterFamily(data.getFamiliesSize(), 0);
+    // std::vector<int> iterFamily(data.getFamiliesSize(), 0);
     for(int p = 0; p < sSize; p++)
     {
-        out << data.getFamilyMember(s[p], iterFamily[s[p]]++) << std::endl;
+        // out << data.getFamilyMember(s[p], iterFamily[s[p]]++) << std::endl;
+        out << s[p] << std::endl;
     }
 
     return 0;
