@@ -325,7 +325,6 @@ void removalCL(vector<int> &s, Data &data, int beginSearch, int endSearch, vecto
     {
         feasiblePositions.push_back(0);
         feasiblePositions.push_back(sSize - 1);
-        feasiblePositionsSize += 2; // this variable is not used from now on
     }
 
     for(int p = beginSearch; p < endSearch; p++)
@@ -698,19 +697,18 @@ void swap(vector<int> &s, int p1, int p2)
     return;
 }
 
-void perturbation(vector<int> &s, Data &data, vector<int> &perturbationType)
+void perturbation(vector<int> &s, Data &data)
 {
-    int t = rand()%perturbationType.size(), sSize = s.size();
-    
-    if(perturbationType[t] == 1)
+    int t = rand()%2, sSize = s.size();
+    int n = sSize/2 < data.getDimension()/20 ? sSize/2 : data.getDimension()/20;
+
+    if(n == 0)
     {
-        int n = sSize/2 < data.getDimension()/20 ? sSize/2 : data.getDimension()/20;
+        return;
+    }
 
-        if(n == 0)
-        {
-            return;
-        }
-
+    if(t == 0) // removal
+    {
         vector<int> feasiblePositions;
         removalCL(s, data, 1, sSize - 1, feasiblePositions);
 
@@ -731,90 +729,40 @@ void perturbation(vector<int> &s, Data &data, vector<int> &perturbationType)
             sSize--;
         }
     }
-    else
+    else // swap
     {
         vector<pair<int, int>> feasiblePairs;
         swapCL(s, data, 0, sSize, feasiblePairs);
 
-        int feasiblePairsSize = feasiblePairs.size();
-        if(feasiblePairsSize)
+        if(!feasiblePairs.empty())
         {
-            int i = rand()%feasiblePairsSize;
+            int i = rand()%feasiblePairs.size();
             swap(s, feasiblePairs[i].first, feasiblePairs[i].second);
 
-            feasiblePairs.erase(feasiblePairs.begin() + i);
-            feasiblePairsSize--;
-
-            int n = sSize/2 < data.getDimension()/20 ? sSize/2 : data.getDimension()/20;
-
-            if(feasiblePairsSize < n - 1)
+            for(int j = 1; j < n; j++)
             {
-                n = feasiblePairsSize;
-            }
+                int beginSearch1 = feasiblePairs[i].first - data.getMaxCadence() > 0 ?
+                    feasiblePairs[i].first - data.getMaxCadence() : 0;
+                int endSearch1 = feasiblePairs[i].first + data.getMaxCadence() + 1 < sSize ?
+                    feasiblePairs[i].first + data.getMaxCadence() + 1: sSize;
+                int beginSearch2 = feasiblePairs[i].second - data.getMaxCadence() > 0 ?
+                    feasiblePairs[i].second - data.getMaxCadence() : 0;
+                int endSearch2 = feasiblePairs[i].second + data.getMaxCadence() + 1 < sSize ?
+                    feasiblePairs[i].second + data.getMaxCadence() + 1: sSize;
 
-            int k = 0;
-            vector<pair<int,int>> pairsStorage;
-            for(int j = 1; j < n; )
-            {
-                vector<int> newS = s;
-                i = rand()%feasiblePairsSize;
-                swap(newS, feasiblePairs[i].first, feasiblePairs[i].second);
+                swapCL(s, data, beginSearch1, endSearch1, beginSearch2, endSearch2, feasiblePairs);
 
-                if(isInfeasible(newS, data))
+                if(!feasiblePairs.empty())
                 {
-                    k++;
-
-                    if(k > 4)
-                    {
-                        k = 0;
-                        j++;
-                    }
-                    
-                    pairsStorage.push_back(feasiblePairs[i]);
-                    feasiblePairs.erase(feasiblePairs.begin() + i);
-                    feasiblePairsSize--;
-
-                    if(!feasiblePairsSize)
-                    {
-                        break;
-                    }
+                    int i = rand()%feasiblePairs.size();
+                    swap(s, feasiblePairs[i].first, feasiblePairs[i].second);
                 }
                 else
                 {
-                    s = newS;
-
-                    int pairsStorageSize = pairsStorage.size();
-                    for(int l = 0; l < pairsStorageSize; l++)
-                    {
-                        feasiblePairs.push_back(pairsStorage[l]);
-                        feasiblePairsSize++;
-                    }
-
-                    pairsStorage.clear();
-
-                    feasiblePairs.erase(feasiblePairs.begin() + i);
-                    feasiblePairsSize--;
-
-                    if(!feasiblePairsSize)
-                    {
-                        break;
-                    }
-
-                    k = 0;
-                    j++;
+                    break;
                 }
             }
         }
-    }
-
-    perturbationType.erase(perturbationType.begin() + t);
-
-    if(perturbationType.empty())
-    {
-        perturbationType.push_back(1);
-        perturbationType.push_back(1);
-        perturbationType.push_back(2);
-        perturbationType.push_back(2);
     }
 
     return;
@@ -838,8 +786,6 @@ int heuristic(Data data, vector<int> &bestS)
         construction(currentBestS, data);
         int currentBestSSize = currentBestS.size();
         Data currentBestData = data;
-
-        vector<int> perturbationType{1, 1, 2, 2};
         
         for(int j = 0; j < data.getDimension(); j++)
         {
@@ -851,13 +797,7 @@ int heuristic(Data data, vector<int> &bestS)
                 break;
             }
             
-            perturbation(s, data, perturbationType);
-
-            if(isInfeasible(s, data))
-            {
-                cout << "INFEASIBILITY DETECTED" << endl;
-                exit(1);
-            }
+            perturbation(s, data);
             
             if(s.size() == data.getDimension())
             {
