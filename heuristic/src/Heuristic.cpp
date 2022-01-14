@@ -418,272 +418,320 @@ void removal(vector<int> &s, Data &data, int p)
     return;
 }
 
-void swapSearch(vector<int> &s, Data &data, int beginSearch, int endSearch, vector<pair<int, int>> &feasiblePairs, int &i)
+bool comparePair(pair<int, int> p1, pair<int, int> p2)
+{
+    if(p1.first > p2.first || p1.second > p2.second)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+bool swapFeasibility(vector<int> &s, Data &data, int p1, int p2)
 {
     int sSize = s.size();
-    for(int p1 = beginSearch; p1 < endSearch - 1; p1++)
+    bool feasiblePair = true;
+
+    for(int c = 0; c < data.getCadencesSize(); c++)
     {
-        for(int p2 = p1 + 1; p2 < endSearch; p2++)
+        // if both jobs or none have cadence c, there is no need to check feasibility
+        if(data.getCadencesPerFamily(s[p1], c))
         {
-            bool feasiblePair = true;
-
-            for(int c = 0; c < data.getCadencesSize(); c++)
+            if(!data.getCadencesPerFamily(s[p2], c))
             {
-                // if both jobs or none have cadence c, there is no need to check feasibility
-                if(data.getCadencesPerFamily(s[p1], c))
+                int begin = p2 - data.getCadence(c) > 0 ? p2 - data.getCadence(c) : 0;
+                int end = p2 + data.getCadence(c) + 1 < sSize ? p2 + data.getCadence(c) + 1 : sSize;
+
+                if(data.cadenceType(c) == 1)
                 {
-                    if(!data.getCadencesPerFamily(s[p2], c))
+                    if(p1 > begin)
                     {
-                        int begin = p2 - data.getCadence(c) > 0 ? p2 - data.getCadence(c) : 0;
-                        int end = p2 + data.getCadence(c) + 1 < sSize ? p2 + data.getCadence(c) + 1 : sSize;
+                        begin = p1 + data.getCadence(c) + 1;
+                        // there is no job with cadence c closer to p1 than data.getCadence(c) positions
+                    }
 
-                        if(data.cadenceType(c) == 1)
+                    for(int k = begin; k < p2; k++)
+                    {
+                        if(data.getCadencesPerFamily(s[k], c))
                         {
-                            if(p1 > begin)
-                            {
-                                begin = p1 + data.getCadence(c) + 1;
-                                // there is no job with cadence c closer to p1 than data.getCadence(c) positions
-                            }
-
-                            for(int k = begin; k < p2; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    feasiblePair = false;
-                                    break;
-                                }
-                            }
-
-                            for(int k = p2 + 1; k < end; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    feasiblePair = false;
-                                    break;
-                                }
-                            }
+                            feasiblePair = false;
+                            break;
                         }
-                        else
+                    }
+
+                    for(int k = p2 + 1; k < end; k++)
+                    {
+                        if(data.getCadencesPerFamily(s[k], c))
                         {
-                            if(p1 > begin)
-                            {
-                                begin = p1 + 1;
-                                // position p1 will be filled by s[p2], which doesn't have cadence c
-                            }
-
-                            int sum = 0;
-
-                            for(int k = begin; k < p2; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-                                }
-                                else
-                                {
-                                    sum = 0; 
-                                }
-                            }
-
-                            sum++;
-                            
-                            if(sum > data.getCadence(c))
-                            {
-                                feasiblePair = false;
-                                break;
-                            }
-
-                            for(int k = p2 + 1; k < end; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-
-                                    if(sum > data.getCadence(c))
-                                    {
-                                        feasiblePair = false;
-                                        break;
-                                    }
-                                }
-                                else
-                                {
-                                    sum = 0; 
-                                }
-                            }
+                            feasiblePair = false;
+                            break;
                         }
                     }
                 }
                 else
                 {
-                    if(data.getCadencesPerFamily(s[p2], c))
+                    if(p1 > begin)
                     {
-                        int begin = p1 - data.getCadence(c) > 0 ? p1 - data.getCadence(c) : 0;
-                        int end = p1 + data.getCadence(c) + 1 < sSize ? p1 + data.getCadence(c) + 1 : sSize;
+                        begin = p1 + 1;
+                        // position p1 will be filled by s[p2], which doesn't have cadence c
+                    }
 
-                        if(data.cadenceType(c) == 1)
+                    int sum = 0;
+
+                    for(int k = begin; k < p2; k++)
+                    {
+                        if(data.getCadencesPerFamily(s[k], c))
                         {
-                            if(p2 < end)
-                            {
-                                end = p2 - data.getCadence(c);
-                                // there is no job with cadence c closer to p2 than data.getCadence(c) positions
-                            }
-
-                            for(int k = begin; k < p1; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    feasiblePair = false;
-                                    break;
-                                }
-                            }
-
-                            for(int k = p1 + 1; k < end; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    feasiblePair = false;
-                                    break;
-                                }
-                            }
+                            sum++;
                         }
                         else
                         {
-                            if(p2 < end)
-                            {
-                                end = p2;
-                                // position p2 will be filled by s[p1], which doesn't have cadence c
-                            }
-                            
-                            int sum = 0;
+                            sum = 0; 
+                        }
+                    }
 
-                            for(int k = begin; k < p1; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-                                }
-                                else
-                                {
-                                    sum = 0; 
-                                }
-                            }
+                    sum++;
+                    
+                    if(sum > data.getCadence(c))
+                    {
+                        feasiblePair = false;
+                        break;
+                    }
 
+                    for(int k = p2 + 1; k < end; k++)
+                    {
+                        if(data.getCadencesPerFamily(s[k], c))
+                        {
                             sum++;
-                            
+
                             if(sum > data.getCadence(c))
                             {
                                 feasiblePair = false;
                                 break;
                             }
-
-                            for(int k = p1 + 1; k < end; k++)
-                            {
-                                if(data.getCadencesPerFamily(s[k], c))
-                                {
-                                    sum++;
-
-                                    if(sum > data.getCadence(c))
-                                    {
-                                        feasiblePair = false;
-                                        break;
-                                    }
-                                }
-                                else
-                                {
-                                    sum = 0; 
-                                }
-                            }
+                        }
+                        else
+                        {
+                            sum = 0; 
                         }
                     }
                 }
             }
-
-            if(feasiblePair)
+        }
+        else
+        {
+            if(data.getCadencesPerFamily(s[p2], c))
             {
-                feasiblePairs.insert(feasiblePairs.begin() + i++, make_pair(p1, p2));
+                int begin = p1 - data.getCadence(c) > 0 ? p1 - data.getCadence(c) : 0;
+                int end = p1 + data.getCadence(c) + 1 < sSize ? p1 + data.getCadence(c) + 1 : sSize;
+
+                if(data.cadenceType(c) == 1)
+                {
+                    if(p2 < end)
+                    {
+                        end = p2 - data.getCadence(c);
+                        // there is no job with cadence c closer to p2 than data.getCadence(c) positions
+                    }
+
+                    for(int k = begin; k < p1; k++)
+                    {
+                        if(data.getCadencesPerFamily(s[k], c))
+                        {
+                            feasiblePair = false;
+                            break;
+                        }
+                    }
+
+                    for(int k = p1 + 1; k < end; k++)
+                    {
+                        if(data.getCadencesPerFamily(s[k], c))
+                        {
+                            feasiblePair = false;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    if(p2 < end)
+                    {
+                        end = p2;
+                        // position p2 will be filled by s[p1], which doesn't have cadence c
+                    }
+                    
+                    int sum = 0;
+
+                    for(int k = begin; k < p1; k++)
+                    {
+                        if(data.getCadencesPerFamily(s[k], c))
+                        {
+                            sum++;
+                        }
+                        else
+                        {
+                            sum = 0; 
+                        }
+                    }
+
+                    sum++;
+                    
+                    if(sum > data.getCadence(c))
+                    {
+                        feasiblePair = false;
+                        break;
+                    }
+
+                    for(int k = p1 + 1; k < end; k++)
+                    {
+                        if(data.getCadencesPerFamily(s[k], c))
+                        {
+                            sum++;
+
+                            if(sum > data.getCadence(c))
+                            {
+                                feasiblePair = false;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            sum = 0; 
+                        }
+                    }
+                }
             }
         }
     }
 
-    return;
+    return feasiblePair;
 }
 
 void swapCL(vector<int> &s, Data &data, int beginSearch, int endSearch, vector<pair<int, int>> &feasiblePairs)
 {
-    int i = 0;
-    swapSearch(s, data, beginSearch, endSearch, feasiblePairs, i);
+    swapCL(s, data, beginSearch, endSearch, 0, 0, feasiblePairs);
     return;
 }
 
-void swapCL(vector<int> &s, Data &data, int beginSearchP1, int endSearchP1, int beginSearchP2, int endSearchP2,
+
+void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int beginSearch2, int endSearch2,
     vector<pair<int, int>> &feasiblePairs)
 {
-    // remove candidates that are in the range between beginSearchP1/P2 and endSearchP1/P2, which will be updated later
+    // remove pairs that have any element in the range between beginSearch1/2 and endSearch1/2, which will be updated later
     int feasiblePairsSize = feasiblePairs.size();
-
-    if(endSearchP1 >= beginSearchP2)
+    int sSize = s.size();
+    
+    if(endSearch1 >= beginSearch2)
     {
-        int i = 0; // i should store the position in which new pairs will start to be inserted, so the vector keeps sorted
-
-        for(; i < feasiblePairsSize; i++)
+        for(int i = 0; i < feasiblePairsSize; i++)
         {
-            if((feasiblePairs[i].first >= beginSearchP1)&&(feasiblePairs[i].first < endSearchP2) ||
-               (feasiblePairs[i].second >= beginSearchP1)&&(feasiblePairs[i].second < endSearchP2))
+            if((feasiblePairs[i].first >= beginSearch1)&&(feasiblePairs[i].first < endSearch2) ||
+               (feasiblePairs[i].second >= beginSearch1)&&(feasiblePairs[i].second < endSearch2))
             {
                 feasiblePairs.erase(feasiblePairs.begin() + i);
                 i--;
                 feasiblePairsSize--;
             }
-            else if(feasiblePairs[i].first >= endSearchP2)
+            else if(feasiblePairs[i].first >= endSearch2)
             {
                 break;
             }
         }
 
-        swapSearch(s, data, beginSearchP1, endSearchP2, feasiblePairs, i);
+        for(int p1 = 0; p1 < beginSearch1; p1++)
+        {
+            for(int p2 = beginSearch1; p2 < endSearch2; p2++)
+            {
+                if(swapFeasibility(s, data, p1, p2))
+                {
+                    feasiblePairs.push_back(make_pair(p1, p2));
+                }
+            }
+        }
+
+        for(int p1 = beginSearch1; p1 < endSearch2; p1++)
+        {
+            for(int p2 = p1 + 1; p2 < sSize; p2++)
+            {
+                if(swapFeasibility(s, data, p1, p2))
+                {
+                    feasiblePairs.push_back(make_pair(p1, p2));
+                }
+            }
+        }
     }
     else
     {
-        int i1 = 0; // i1 should store the position in which new pairs will start to be inserted around p1,
-                    // so the vector keeps sorted
-        for(; i1 < feasiblePairsSize; i1++)
+        for(int i = 0; i < feasiblePairsSize; i++)
         {
-            if((feasiblePairs[i1].first >= beginSearchP1)&&(feasiblePairs[i1].first < endSearchP1) ||
-               (feasiblePairs[i1].second >= beginSearchP1)&&(feasiblePairs[i1].second < endSearchP1))
+            if((feasiblePairs[i].first >= beginSearch1)&&(feasiblePairs[i].first < endSearch1) ||
+               (feasiblePairs[i].second >= beginSearch1)&&(feasiblePairs[i].second < endSearch1) ||
+               (feasiblePairs[i].first >= beginSearch2)&&(feasiblePairs[i].first < endSearch2) ||
+               (feasiblePairs[i].second >= beginSearch2)&&(feasiblePairs[i].second < endSearch2))
             {
-                feasiblePairs.erase(feasiblePairs.begin() + i1);
-                i1--;
+                feasiblePairs.erase(feasiblePairs.begin() + i);
+                i--;
                 feasiblePairsSize--;
             }
-            else if(feasiblePairs[i1].first >= endSearchP1)
+            else if(feasiblePairs[i].first >= endSearch2)
             {
                 break;
             }
         }
 
-        swapSearch(s, data, beginSearchP1, endSearchP1, feasiblePairs, i1);
-
-        feasiblePairsSize = feasiblePairs.size();
-
-        int i2 = i1; // i2 should store the position in which new pairs will start to be inserted around p2,
-                     // so the vector keeps sorted
-        for(; i2 < feasiblePairsSize; i2++)
+        for(int p1 = 0; p1 < beginSearch1; p1++)
         {
-            if((feasiblePairs[i2].first >= beginSearchP2)&&(feasiblePairs[i2].first < endSearchP2) ||
-               (feasiblePairs[i2].second >= beginSearchP2)&&(feasiblePairs[i2].second < endSearchP2))
+            for(int p2 = beginSearch1; p2 < endSearch1; p2++)
             {
-                feasiblePairs.erase(feasiblePairs.begin() + i2);
-                i2--;
-                feasiblePairsSize--;
+                if(swapFeasibility(s, data, p1, p2))
+                {
+                    feasiblePairs.push_back(make_pair(p1, p2));
+                }
             }
-            else if(feasiblePairs[i2].first >= endSearchP2)
+            for(int p2 = beginSearch2; p2 < endSearch2; p2++)
             {
-                break;
+                if(swapFeasibility(s, data, p1, p2))
+                {
+                    feasiblePairs.push_back(make_pair(p1, p2));
+                }
             }
         }
 
-        swapSearch(s, data, beginSearchP2, endSearchP2, feasiblePairs, i2);
+        for(int p1 = beginSearch1; p1 < endSearch1; p1++)
+        {
+            for(int p2 = p1 + 1; p2 < sSize; p2++)
+            {
+                if(swapFeasibility(s, data, p1, p2))
+                {
+                    feasiblePairs.push_back(make_pair(p1, p2));
+                }
+            }
+        }
+
+        for(int p1 = endSearch1; p1 < beginSearch2; p1++)
+        {
+            for(int p2 = beginSearch2; p2 < endSearch2; p2++)
+            {
+                if(swapFeasibility(s, data, p1, p2))
+                {
+                    feasiblePairs.push_back(make_pair(p1, p2));
+                }
+            }
+        }
+
+        for(int p1 = beginSearch2; p1 < endSearch2; p1++)
+        {
+            for(int p2 = p1 + 1; p2 < sSize; p2++)
+            {
+                if(swapFeasibility(s, data, p1, p2))
+                {
+                    feasiblePairs.push_back(make_pair(p1, p2));
+                }
+            }
+        }
     }
+
+    sort(feasiblePairs.begin(), feasiblePairs.end(), comparePair);
 
     return;
 }
@@ -744,11 +792,11 @@ void perturbation(vector<int> &s, Data &data)
                 int beginSearch1 = feasiblePairs[i].first - data.getMaxCadence() > 0 ?
                     feasiblePairs[i].first - data.getMaxCadence() : 0;
                 int endSearch1 = feasiblePairs[i].first + data.getMaxCadence() + 1 < sSize ?
-                    feasiblePairs[i].first + data.getMaxCadence() + 1: sSize;
+                    feasiblePairs[i].first + data.getMaxCadence() + 1 : sSize;
                 int beginSearch2 = feasiblePairs[i].second - data.getMaxCadence() > 0 ?
                     feasiblePairs[i].second - data.getMaxCadence() : 0;
                 int endSearch2 = feasiblePairs[i].second + data.getMaxCadence() + 1 < sSize ?
-                    feasiblePairs[i].second + data.getMaxCadence() + 1: sSize;
+                    feasiblePairs[i].second + data.getMaxCadence() + 1 : sSize;
 
                 swapCL(s, data, beginSearch1, endSearch1, beginSearch2, endSearch2, feasiblePairs);
 
