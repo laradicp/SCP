@@ -613,7 +613,6 @@ void swapCL(vector<int> &s, Data &data, int beginSearch, int endSearch, vector<p
     return;
 }
 
-
 void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int beginSearch2, int endSearch2,
     vector<pair<int, int>> &feasiblePairs)
 {
