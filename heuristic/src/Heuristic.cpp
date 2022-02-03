@@ -747,7 +747,7 @@ void swap(vector<int> &s, int p1, int p2)
 void perturbation(vector<int> &s, Data &data)
 {
     int t = rand()%2, sSize = s.size();
-    int n = sSize/2 < data.getDimension()/20 ? sSize/2 : data.getDimension()/20;
+    int n = sSize/2 < data.getDimension()/25 ? sSize/2 : data.getDimension()/25;
 
     if(n == 0)
     {

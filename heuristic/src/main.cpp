@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     }
 
     Data data(argv[1]);
-    std::vector<int> s = data.getLowerBoundSol();
+    std::vector<int> s;
     auto begin = std::chrono::system_clock::now();
 
     heuristic(data, s);

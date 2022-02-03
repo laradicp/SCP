@@ -485,7 +485,7 @@ int main(int argc, char** argv)
     }
     
     Data data(argv[1]);
-    std::vector<int> s;
+    std::vector<int> s = data.getLowerBoundSol();
 
     auto begin = std::chrono::system_clock::now();
     std::chrono::duration<double> time = std::chrono::system_clock::now() - begin;

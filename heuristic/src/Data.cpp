@@ -299,22 +299,32 @@ std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<doubl
 
     int min = ceil(lb[i - 1]/score[i]) < jobsPerScore[i] ? ceil(lb[i - 1]/score[i]) : jobsPerScore[i],
         violations = 0;
-    int usedPos;
-    for(int j = 1; j < i; j++)
+    int usedPos = 0, insertedPos = 0;
+    // j = 0 does not correspond to any cadence, therefore it is not defined
+    if(i == 1)
     {
-        usedPos = used(j, i, s, score, jobsPerScore, familiesPerScore, intersection);
-        violations += intersection[i][j] < usedPos ? intersection[i][j] : usedPos;
+        usedPos = used(i, i, s, score, jobsPerScore, familiesPerScore, intersection);
+        insertedPos = usedPos;
+    }
+    else
+    {
+        for(int j = 1; j < i; j++)
+        {
+            usedPos = used(j, i, s, score, jobsPerScore, familiesPerScore, intersection);
+            insertedPos = intersection[i][j] < usedPos ? intersection[i][j] : usedPos;
+            violations += insertedPos;
+        }
     }
 
     int max = min - violations > 0 ? min - violations : 0; // number of jobs added to solution
-
     // update primal solution
+    int insertP = insertedPos*(getCadence(i - 1) + 1); // position in which the insertion starts
+
     int familiesPerScoreSize = familiesPerScore[i].size();
     int job = 0;
-    int insertPos = usedPos*(getCadence(i - 1) + 1); // check getCadence(i - 1), i - 1 since first is zero cadence
     if(cadenceType(i - 1) == 2)
     {
-        insertPos = floor(insertPos/double(getCadence(i - 1)));
+        insertP = floor(insertP/double(getCadence(i - 1)));
         for(int fIdx = 0; fIdx < familiesPerScoreSize; fIdx++)
         {
             for(; job < max; job++)
@@ -324,11 +334,10 @@ std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<doubl
                     break;
                 }
 
-                // ERROR: insertPos >= sSize
-                s.insert(s.begin() + insertPos, familiesPerScore[i][fIdx]);
+                s.insert(s.begin() + insertP, familiesPerScore[i][fIdx]);
                 familySize[familiesPerScore[i][fIdx]]--;
 
-                insertPos = floor(++usedPos*(getCadence(i - 1) + 1)/double(getCadence(i - 1)));
+                insertP = floor(++insertedPos*(getCadence(i - 1) + 1)/double(getCadence(i - 1)));
             }
 
             if(job == max)
@@ -348,11 +357,10 @@ std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<doubl
                     break;
                 }
 
-                // ERROR: insertPos >= sSize
-                s.insert(s.begin() + insertPos, familiesPerScore[i][fIdx]);
+                s.insert(s.begin() + insertP, familiesPerScore[i][fIdx]);
                 familySize[familiesPerScore[i][fIdx]]--;
 
-                insertPos += getCadence(i - 1) + 1;
+                insertP += getCadence(i - 1) + 1;
             }
 
             if(job == max)

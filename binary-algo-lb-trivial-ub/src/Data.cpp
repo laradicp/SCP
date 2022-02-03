@@ -100,6 +100,15 @@ Data::Data(std::string filePath)
     dimension = i;
 
     in.close();
+
+    maxCadence = 0;
+    for(int c = 0; c < cadencesSize; c++)
+    {
+        if(getCadence(c) > maxCadence)
+        {
+            maxCadence = getCadence(c);
+        }
+    }
 }
 
 int Data::getDimension()
@@ -125,6 +134,11 @@ int Data::getCadence(int c)
     }
 
     return cadences[c].first;
+}
+
+int Data::getMaxCadence()
+{
+    return maxCadence;
 }
 
 bool Data::compareCadencePairs(std::pair<std::pair<int, int>, bool> p1, std::pair<std::pair<int, int>, bool> p2)
@@ -229,45 +243,155 @@ int Data::getUpperBound()
     return ub;
 }
 
-int Data::used(int j, int i, std::vector<double> &score, std::vector<int> &jobsPerScore, std::vector<std::vector<int>> &intersection)
+int Data::used(int j, int i, std::vector<int> &s, std::vector<double> &score, std::vector<int> &jobsPerScore,
+    std::vector<std::vector<int>> &familiesPerScore, std::vector<std::vector<int>> &intersection)
 {
-    int fittingJobs = ceil(calculateLB(i - 1, score, jobsPerScore, intersection)/score[i]);
+    calculateLB(i - 1, s, score, jobsPerScore, familiesPerScore, intersection);
+
+    int fittingJobs = ceil(lb[i - 1]/score[i]);
     if(j == i)
     {
         return fittingJobs < jobsPerScore[i] ? fittingJobs : jobsPerScore[i] ;
     }
-    else
-    {
-        int min = fittingJobs < intersection[i][j] ? fittingJobs : intersection[i][j];
-        return used(j, i - 1, score, jobsPerScore, intersection) + min;
-    }
+
+    int min = fittingJobs < intersection[i][j] ? fittingJobs : intersection[i][j];
+    return used(j, i - 1, s, score, jobsPerScore, familiesPerScore, intersection) + min;
 }
 
-int Data::calculateLB(int i, std::vector<double> &score, std::vector<int> &jobsPerScore, std::vector<std::vector<int>> &intersection)
+std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<double> &score, std::vector<int> &jobsPerScore,
+    std::vector<std::vector<int>> &familiesPerScore, std::vector<std::vector<int>> &intersection)
 {
+    if(lb[i] != -1)
+    {
+        return s;
+    }
+
     if(i == 0)
     {
-        return jobsPerScore[i];
+        // update primal solution
+        int familiesPerScoreSize = familiesPerScore[i].size();
+        int job = 0;
+        for(int fIdx = 0; fIdx < familiesPerScoreSize; fIdx++)
+        {
+            for(; job < jobsPerScore[i]; job++)
+            {
+                if(familySize[familiesPerScore[i][fIdx]] == 0)
+                {
+                    break;
+                }
+
+                s.push_back(familiesPerScore[i][fIdx]);
+                familySize[familiesPerScore[i][fIdx]]--;
+            }
+
+            if(job == jobsPerScore[i])
+            {
+                break;
+            }
+        }
+
+        lb[i] = jobsPerScore[i];
+
+        return s;
+    }
+    
+    calculateLB(i - 1, s, score, jobsPerScore, familiesPerScore, intersection);
+
+    int min = ceil(lb[i - 1]/score[i]) < jobsPerScore[i] ? ceil(lb[i - 1]/score[i]) : jobsPerScore[i],
+        violations = 0;
+    int usedPos = 0, insertedPos = 0;
+    // j = 0 does not correspond to any cadence, therefore it is not defined
+    if(i == 1)
+    {
+        usedPos = used(i, i, s, score, jobsPerScore, familiesPerScore, intersection);
+        insertedPos = usedPos;
     }
     else
     {
-        int previousLB = calculateLB(i - 1, score, jobsPerScore, intersection), 
-            min = ceil(previousLB/score[i]) < jobsPerScore[i] ? ceil(previousLB/score[i]) : jobsPerScore[i],
-            violations = 0;
         for(int j = 1; j < i; j++)
         {
-            int usedPos = used(j, i, score, jobsPerScore, intersection);
-            violations += intersection[i][j] < usedPos ? intersection[i][j] : usedPos;
+            usedPos = used(j, i, s, score, jobsPerScore, familiesPerScore, intersection);
+            insertedPos = intersection[i][j] < usedPos ? intersection[i][j] : usedPos;
+            violations += insertedPos;
         }
-        int max = min - violations > 0 ? min - violations : 0;
-        return previousLB + max;        
     }
+
+    int max = min - violations > 0 ? min - violations : 0; // number of jobs added to solution
+    // update primal solution
+    int insertP = insertedPos*(getCadence(i - 1) + 1); // position in which the insertion starts
+
+    int familiesPerScoreSize = familiesPerScore[i].size();
+    int job = 0;
+    if(cadenceType(i - 1) == 2)
+    {
+        insertP = floor(insertP/double(getCadence(i - 1)));
+        for(int fIdx = 0; fIdx < familiesPerScoreSize; fIdx++)
+        {
+            for(; job < max; job++)
+            {
+                if(familySize[familiesPerScore[i][fIdx]] == 0)
+                {
+                    break;
+                }
+
+                s.insert(s.begin() + insertP, familiesPerScore[i][fIdx]);
+                familySize[familiesPerScore[i][fIdx]]--;
+
+                insertP = floor(++insertedPos*(getCadence(i - 1) + 1)/double(getCadence(i - 1)));
+            }
+
+            if(job == max)
+            {
+                break;
+            }
+        }
+    }
+    else
+    {
+        for(int fIdx = 0; fIdx < familiesPerScoreSize; fIdx++)
+        {
+            for(; job < max; job++)
+            {
+                if(familySize[familiesPerScore[i][fIdx]] == 0)
+                {
+                    break;
+                }
+
+                s.insert(s.begin() + insertP, familiesPerScore[i][fIdx]);
+                familySize[familiesPerScore[i][fIdx]]--;
+
+                insertP += getCadence(i - 1) + 1;
+            }
+
+            if(job == max)
+            {
+                break;
+            }
+        }
+    }
+
+    lb[i] = lb[i - 1] + max;
+
+    return s;
 }
 
 int Data::getLowerBound()
 {
+    if(lb.size() > getCadencesSize())
+    {
+        return lb[getCadencesSize()];
+    }
+
+    return 1;
+}
+
+std::vector<int> Data::getLowerBoundSol()
+{
+    lb.resize(getCadencesSize() + 1, -1);
+    std::vector<int> s;
     std::vector<double> score(getCadencesSize() + 1, 0);
     std::vector<int> jobsPerScore(getCadencesSize() + 1, 0);
+    std::vector<std::vector<int>> familiesPerScore(getCadencesSize() + 1, std::vector<int>(0, 0));
     std::vector<std::vector<int>> intersection(getCadencesSize() + 1, std::vector<int>(getCadencesSize() + 1, 0));
 
     // Set scores
@@ -305,6 +429,7 @@ int Data::getLowerBound()
                 {
                     // Update |M|
                     jobsPerScore[c1] += getFamilySize(f);
+                    familiesPerScore[c1].push_back(f);
                     // Update intersections
                     for(int c2 = 1; c2 < c1; c2++)
                     {
@@ -320,8 +445,9 @@ int Data::getLowerBound()
         {
             // Update |M|
             jobsPerScore[0] += getFamilySize(f);
+            familiesPerScore[0].push_back(f);
         }
     }
     
-    return calculateLB(getCadencesSize(), score, jobsPerScore, intersection);
+    return calculateLB(getCadencesSize(), s, score, jobsPerScore, familiesPerScore, intersection);
 }

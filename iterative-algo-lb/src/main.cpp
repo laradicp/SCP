@@ -486,10 +486,10 @@ int main(int argc, char** argv)
     
     Data data(argv[1]);
 
-    int lb = data.getLowerBound();
     auto begin = std::chrono::system_clock::now();
     std::chrono::duration<double> time = std::chrono::system_clock::now() - begin;
-    std::vector<int> s;
+    std::vector<int> s = data.getLowerBoundSol();
+    int lb = data.getLowerBound();
     
     std::cout << "start iterative search (increment)" << std::endl;
     std::cout << "\tlb: " << ++lb << std::endl;
