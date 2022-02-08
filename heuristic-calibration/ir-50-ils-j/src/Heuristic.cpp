@@ -825,7 +825,7 @@ int heuristic(Data data, vector<int> &bestS)
     Data fullData = data;
     int bestSSize = 0;
 
-    for(int i = 0; i < 15; i++)
+    for(int i = 0; i < 50; i++)
     {
         vector<int> currentBestS;
         data = fullData;
@@ -834,8 +834,7 @@ int heuristic(Data data, vector<int> &bestS)
         int currentBestSSize = currentBestS.size();
         Data currentBestData = data;
         
-        int iterMax = 2*data.getDimension();
-        for(int j = 0; j < iterMax; j++)
+        for(int j = 0; j < data.getDimension(); j++)
         {
             vector<int> s = currentBestS;
             data = currentBestData;
