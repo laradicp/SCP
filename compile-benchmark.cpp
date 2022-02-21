@@ -160,7 +160,7 @@ int main()
 
             for(int k = 0; k < 2; k++)
             {
-                std::sort(matrixObjTime[i][j][k].begin(), matrixObjTime[i][j][k].end(), compare);
+                // std::sort(matrixObjTime[i][j][k].begin(), matrixObjTime[i][j][k].end(), compare);
                 
                 std::cout << "\t" << k << ":\n\t\t";
                 for(int l = 0; l < noOfInstances; l++)
@@ -184,7 +184,7 @@ int main()
     for(int j = 0; j < 4; j++)
     {
         getDual(instancesSets[j], dualPure[j]);
-        std::sort(dualPure[j].begin(), dualPure[j].end(), compare);
+        // std::sort(dualPure[j].begin(), dualPure[j].end(), compare);
         dual[j] = dualPure[j];
 
         std::cout << "\t" << instancesSets[j] << ":\n\t\t";
@@ -335,8 +335,8 @@ int main()
         timefile.close();
     }
 
-    std::cout << "mean size: " << sumSize/193.0 << std::endl;
-    std::cout << "median: " << median << std::endl;
+    // std::cout << "mean size: " << sumSize/193.0 << std::endl;
+    // std::cout << "median: " << median << std::endl;
 
     // optimals file
     for(int j = 0; j < 4; j++)
@@ -371,10 +371,7 @@ int main()
         }
 
         tablefile << "\\hline" << std::endl;
-
-        tablefile << "\t&\t#primal\t&\t#optimal" << "\t&\tlowest gap" <<
-        "\t&\toutput\t&\tgap\t&\tT\t&\tT$_\\text{p}$ (s)\\\\" << std::endl;
-
+        tablefile << "search\t&\tlb\t&\tub\t&\t\\#primal\t&\t\\#opt\t&\t\\#lowest\t&\toutput\t&\tgap (\\%)\t&\tT (s)\t&\tT$_\\text{p}$ (s)\\\\" << std::endl;
         tablefile << "\\hline" << std::endl;
         
         tablefile << std::fixed;
@@ -382,7 +379,48 @@ int main()
 
         for(int i = 0; i < 12; i++)
         {
-            tablefile << versions[i] << "\t&\t";
+            int wordSearchSize = versions[i].size() - 1;
+            for(int k = 0; k < wordSearchSize; k++)
+            {
+                if(versions[i][k] == 'p')
+                {
+                    tablefile << "\\hline" << std::endl;
+                    tablefile << "\\multicolumn{3}{c|}{optimization model}\t&\t";
+                    break;
+                }
+
+                if(versions[i][k] == 'b')
+                {
+                    tablefile << "binary\t&\t";
+                }
+                else if(versions[i][k] == 'i')
+                {
+                    tablefile << "iterative\t&\t";
+
+                    if(versions[i][2] == 'u')
+                    {
+                        tablefile << "\\multicolumn{1}{c}{-}\t&\t";
+                    }
+                }
+                
+                if(versions[i][k] == 'a')
+                {
+                    tablefile << "combinatorial\t&\t";
+                }
+                else if(versions[i][k] == 'h')
+                {
+                    tablefile << "heuristic\t&\t";
+                }
+                else if(versions[i][k] == 't')
+                {
+                    tablefile << "trivial\t&\t";
+                }
+
+                if((versions[i][0] == 'i')&&(versions[i][k + 1] == 'l'))
+                {
+                    tablefile << "\\multicolumn{1}{c|}{-}\t&\t";
+                }
+            }
             
             // #primal
             tablefile << solved[i][j] << "\t&\t";

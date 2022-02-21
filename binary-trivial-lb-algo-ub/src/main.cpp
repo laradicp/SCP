@@ -486,9 +486,10 @@ int main(int argc, char** argv)
     
     Data data(argv[1]);
 
-    int lb = 1, ub = data.getUpperBound();
     auto begin = std::chrono::system_clock::now();
     std::chrono::duration<double> time = std::chrono::system_clock::now() - begin;
+
+    int lb = 1, ub = data.getUpperBound();
     std::vector<int> s;
     
     std::cout << "start binary search" << std::endl;

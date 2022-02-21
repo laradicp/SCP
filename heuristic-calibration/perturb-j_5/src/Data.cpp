@@ -312,7 +312,7 @@ std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<doubl
     // update primal solution
     int familiesPerScoreSize = familiesPerScore[i].size();
     int job = 0;
-    int insertPos = usedPos*(getCadence(i - 1) + 1); // check getCadence(i - 1), i - 1 since first is zero cadence
+    int insertPos = usedPos*(getCadence(i - 1) + 1); // i - 1 since first score is zero cadence
     if(cadenceType(i - 1) == 2)
     {
         insertPos = floor(insertPos/double(getCadence(i - 1)));
