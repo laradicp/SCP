@@ -140,9 +140,9 @@ bool compare(std::pair<double, int> p1, std::pair<double, int> p2) { return (p1.
 
 int main()
 {
-    std::vector<std::string> versions{"balau", "baltu", "bhlau", "bhltu", "btlau", "btltu", "ial", "ihl", "itl", "iau", "itu", "pure"},
+    std::vector<std::string> versions{"al", "hl", "au", "balau", "baltu", "bhlau", "bhltu", "btlau", "btltu", "ial", "ihl", "itl", "iau", "itu", "pure"},
         instancesSets = {"A", "B", "C", "D"};
-    std::vector<std::vector<std::vector<std::vector<std::pair<double, int>>>>> matrixObjTime(12,
+    std::vector<std::vector<std::vector<std::vector<std::pair<double, int>>>>> matrixObjTime(15,
         std::vector<std::vector<std::vector<std::pair<double, int>>>>(4, std::vector<std::vector<std::pair<double, int>>>(2,
         std::vector<std::pair<double, int>>(0, std::make_pair(0, 0)))));
     std::vector<std::vector<std::pair<double, int>>> dual(4, std::vector<std::pair<double, int>>(0, std::make_pair(0, 0))),
@@ -151,7 +151,7 @@ int main()
 
     for(int j = 0; j < 4; j++)
     {
-        for(int i = 0; i < 12; i++)
+        for(int i = 0; i < 15; i++)
         {
             std::cout << versions[i] << instancesSets[j] << std::endl << std::endl;
             getMatrixObjTimeSet(versions[i] + instancesSets[j], matrixObjTime[i][j]);
@@ -190,9 +190,23 @@ int main()
         std::cout << "\t" << instancesSets[j] << ":\n\t\t";
         for(int l = 0; l < noOfInstances; l++)
         {
-            for(int i = 0; i < 12; i++)
+            for(int i = 0; i < 15; i++)
             {
-                if(i < 9 || i == 11)
+                if(i < 2)
+                {
+                    if(matrixObjTime[i][j][0][l].first > primal[j][l])
+                    {
+                        primal[j][l] = matrixObjTime[i][j][0][l].first;
+                    }
+                }
+                else if(i == 2)
+                {
+                    if(matrixObjTime[i][j][0][l].first < dual[j][l].first)
+                    {
+                        dual[j][l].first = matrixObjTime[i][j][0][l].first;
+                    }
+                }
+                else if(i < 12 || i == 14)
                 {
                     if(matrixObjTime[i][j][0][l].first > primal[j][l])
                     {
@@ -233,16 +247,16 @@ int main()
         std::cout << std::endl << std::endl;
     }
 
-    std::vector<std::vector<int>> solved(12, std::vector<int>(4, 0));
-    std::vector<std::vector<int>> optimal(12, std::vector<int>(4, 0));
+    std::vector<std::vector<int>> solved(15, std::vector<int>(4, 0));
+    std::vector<std::vector<int>> optimal(15, std::vector<int>(4, 0));
     std::vector<std::vector<std::vector<double>>> gaps;
     std::vector<std::vector<double>> lowestGap(4, std::vector<double>(193, __DBL_MAX__));
-    std::vector<std::vector<double>> gapSum(12, std::vector<double>(4, 0));
-    std::vector<std::vector<double>> timeSum(12, std::vector<double>(4, 0));
-    std::vector<std::vector<double>> timeOptSum(12, std::vector<double>(4, 0));
+    std::vector<std::vector<double>> gapSum(15, std::vector<double>(4, 0));
+    std::vector<std::vector<double>> timeSum(15, std::vector<double>(4, 0));
+    std::vector<std::vector<double>> timeOptSum(15, std::vector<double>(4, 0));
 
     // graphs and setup
-    for(int i = 0; i < 12; i++)
+    for(int i = 0; i < 15; i++)
     {
         std::ofstream gapfile;
 
@@ -280,17 +294,17 @@ int main()
             {
                 double gap;
 
-                if(i < 9)
+                if((i < 12)&&(i != 2))
                 {
                     gap = 100*(dual[j][l].first - matrixObjTime[i][j][0][l].first)/matrixObjTime[i][j][0][l].first;
 
                     solved[i][j]++;
                 }
-                else if(i < 11)
+                else if(i < 14)
                 {
                     gap = 100*(matrixObjTime[i][j][0][l].first - primal[j][l])/primal[j][l];
 
-                    if(matrixObjTime[i][j][1][l].first < 600)
+                    if((matrixObjTime[i][j][1][l].first < 600)&&(i != 1))
                     {
                         solved[i][j]++;
                     }
@@ -377,11 +391,32 @@ int main()
         tablefile << std::fixed;
         tablefile << std::setprecision(2);
 
-        for(int i = 0; i < 12; i++)
+        for(int i = 0; i < 15; i++)
         {
             int wordSearchSize = versions[i].size() - 1;
             for(int k = 0; k < wordSearchSize; k++)
             {
+                if(wordSearchSize == 1)
+                {
+                    if(versions[i][0] == 'h')
+                    {
+                        tablefile << "\\multicolumn{1}{c}{-}\t&\theuristic\t&\t\\multicolumn{1}{c|}{-}\t&\t";
+                    }
+                    else
+                    {
+                        if(versions[i][1] == 'l')
+                        {
+                            tablefile << "\\multicolumn{1}{c}{-}\t&\tcombinatorial\t&\t\\multicolumn{1}{c|}{-}\t&\t";
+                        }
+                        else
+                        {
+                            tablefile << "\\multicolumn{1}{c}{-}\t&\t\\multicolumn{1}{c}{-}\t&\tcombinatorial\t&\t";
+                        }
+                    }
+
+                    break;
+                }
+
                 if(versions[i][k] == 'p')
                 {
                     tablefile << "\\hline" << std::endl;
@@ -440,7 +475,7 @@ int main()
             tablefile << noOfLowestGaps << "\t&\t";
 
             // output
-            if(i < 9)
+            if((i < 12)&&(i != 2))
             {
                 tablefile << "primal\t&\t";
             }
