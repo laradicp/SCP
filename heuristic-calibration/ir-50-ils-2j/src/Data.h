@@ -17,7 +17,6 @@ class Data
         int cadencesSize;
         int familiesSize;
         std::vector<int> familySize;
-        std::vector<std::vector<bool>> cadencesPerFamily;
         std::vector<int> lb;
 
         static bool compareCadencePairs(std::pair<std::pair<int, int>, bool> p1, std::pair<std::pair<int, int>, bool> p2);

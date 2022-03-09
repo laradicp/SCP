@@ -304,7 +304,7 @@ int main()
                 {
                     gap = 100*(matrixObjTime[i][j][0][l].first - primal[j][l])/primal[j][l];
 
-                    if((matrixObjTime[i][j][1][l].first < 600)&&(i != 1))
+                    if((matrixObjTime[i][j][1][l].first < 600)&&(i != 2))
                     {
                         solved[i][j]++;
                     }

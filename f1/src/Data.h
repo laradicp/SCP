@@ -16,6 +16,7 @@ class Data
         int cadencesSize;
         int familiesSize;
         std::vector<int> familySize;
+        std::vector<std::vector<bool>> cadencesPerJob;
 
     public:
         Data(std::string filePath);
@@ -35,6 +36,7 @@ class Data
         int getFamilySize(int f);
 
         bool getCadencesPerFamily(int f, int c);
+        bool getCadencesPerJob(int i, int c);
 
         int getUpperBound();
 };
