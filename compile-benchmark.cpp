@@ -7,7 +7,7 @@
 
 void getDual(std::string instanceSet, std::vector<std::pair<double, int>> &dual)
 {
-    std::string filepath = "objval/objval-dual" + instanceSet;
+    std::string filepath = "objval/objval-dual-" + instanceSet;
     std::ifstream file, dimensionfile;
     std::vector<int> dimensions;
 
@@ -140,18 +140,18 @@ bool compare(std::pair<double, int> p1, std::pair<double, int> p2) { return (p1.
 
 int main()
 {
-    std::vector<std::string> versions{"al", "hl", "au", "balau", "baltu", "bhlau", "bhltu", "btlau", "btltu", "ial", "ihl", "itl", "iau", "itu", "pure"},
+    std::vector<std::string> versions{"al", "hl", "au", "balau", "baltu", "bhlau", "bhltu", "btlau", "btltu", "ial", "ihl", "itl", "iau", "itu", "f1", "f2"},
         instancesSets = {"A", "B", "C", "D"};
-    std::vector<std::vector<std::vector<std::vector<std::pair<double, int>>>>> matrixObjTime(15,
+    std::vector<std::vector<std::vector<std::vector<std::pair<double, int>>>>> matrixObjTime(16,
         std::vector<std::vector<std::vector<std::pair<double, int>>>>(4, std::vector<std::vector<std::pair<double, int>>>(2,
         std::vector<std::pair<double, int>>(0, std::make_pair(0, 0)))));
     std::vector<std::vector<std::pair<double, int>>> dual(4, std::vector<std::pair<double, int>>(0, std::make_pair(0, 0))),
-        dualPure(4, std::vector<std::pair<double, int>>(0, std::make_pair(0, 0)));
+        dualF1(4, std::vector<std::pair<double, int>>(0, std::make_pair(0, 0))), dualF2(4, std::vector<std::pair<double, int>>(0, std::make_pair(0, 0)));
     int noOfInstances, sumSize, median;
 
     for(int j = 0; j < 4; j++)
     {
-        for(int i = 0; i < 15; i++)
+        for(int i = 0; i < 16; i++)
         {
             std::cout << versions[i] << instancesSets[j] << std::endl << std::endl;
             getMatrixObjTimeSet(versions[i] + instancesSets[j], matrixObjTime[i][j]);
@@ -183,14 +183,20 @@ int main()
     std::cout << "dual:" << std::endl << std::endl;
     for(int j = 0; j < 4; j++)
     {
-        getDual(instancesSets[j], dualPure[j]);
+        getDual(versions[14] + instancesSets[j], dualF1[j]);
+        getDual(versions[15] + instancesSets[j], dualF2[j]);
         // std::sort(dualPure[j].begin(), dualPure[j].end(), compare);
-        dual[j] = dualPure[j];
+        dual[j] = dualF2[j];
 
         std::cout << "\t" << instancesSets[j] << ":\n\t\t";
         for(int l = 0; l < noOfInstances; l++)
         {
-            for(int i = 0; i < 15; i++)
+            if(dualF1[j][l].first < dual[j][l].first)
+            {
+                dual[j][l].first = dualF1[j][l].first;
+            }
+
+            for(int i = 0; i < 16; i++)
             {
                 if(i < 2)
                 {
@@ -206,7 +212,7 @@ int main()
                         dual[j][l].first = matrixObjTime[i][j][0][l].first;
                     }
                 }
-                else if(i < 12 || i == 14)
+                else if(i < 12 || i > 13)
                 {
                     if(matrixObjTime[i][j][0][l].first > primal[j][l])
                     {
@@ -247,16 +253,16 @@ int main()
         std::cout << std::endl << std::endl;
     }
 
-    std::vector<std::vector<int>> solved(15, std::vector<int>(4, 0));
-    std::vector<std::vector<int>> optimal(15, std::vector<int>(4, 0));
+    std::vector<std::vector<int>> solved(16, std::vector<int>(4, 0));
+    std::vector<std::vector<int>> optimal(16, std::vector<int>(4, 0));
     std::vector<std::vector<std::vector<double>>> gaps;
     std::vector<std::vector<double>> lowestGap(4, std::vector<double>(193, __DBL_MAX__));
-    std::vector<std::vector<double>> gapSum(15, std::vector<double>(4, 0));
-    std::vector<std::vector<double>> timeSum(15, std::vector<double>(4, 0));
-    std::vector<std::vector<double>> timeOptSum(15, std::vector<double>(4, 0));
+    std::vector<std::vector<double>> gapSum(16, std::vector<double>(4, 0));
+    std::vector<std::vector<double>> timeSum(16, std::vector<double>(4, 0));
+    std::vector<std::vector<double>> timeOptSum(16, std::vector<double>(4, 0));
 
     // graphs and setup
-    for(int i = 0; i < 15; i++)
+    for(int i = 0; i < 16; i++)
     {
         std::ofstream gapfile;
 
@@ -309,9 +315,18 @@ int main()
                         solved[i][j]++;
                     }
                 }
+                else if(i == 14)
+                {
+                    gap = 100*(dualF1[j][l].first - primal[j][l])/primal[j][l];
+
+                    if(matrixObjTime[i][j][0][l].first > 0)
+                    {
+                        solved[i][j]++;
+                    }
+                }
                 else
                 {
-                    gap = 100*(dualPure[j][l].first - primal[j][l])/primal[j][l];
+                    gap = 100*(dualF2[j][l].first - primal[j][l])/primal[j][l];
 
                     if(matrixObjTime[i][j][0][l].first > 0)
                     {
@@ -391,14 +406,19 @@ int main()
         tablefile << std::fixed;
         tablefile << std::setprecision(2);
 
-        for(int i = 0; i < 15; i++)
+        for(int i = 0; i < 16; i++)
         {
             int wordSearchSize = versions[i].size() - 1;
             for(int k = 0; k < wordSearchSize; k++)
             {
                 if(wordSearchSize == 1)
                 {
-                    if(versions[i][0] == 'h')
+                    if(versions[i][0] == 'f')
+                    {
+                        tablefile << "\\hline" << std::endl;
+                        tablefile << std::string("\\multicolumn{3}{c|}{F") + versions[i][k + 1] + "}\t&\t";
+                    }
+                    else if(versions[i][0] == 'h')
                     {
                         tablefile << "\\multicolumn{1}{c}{-}\t&\theuristic\t&\t\\multicolumn{1}{c|}{-}\t&\t";
                     }
@@ -414,13 +434,6 @@ int main()
                         }
                     }
 
-                    break;
-                }
-
-                if(versions[i][k] == 'p')
-                {
-                    tablefile << "\\hline" << std::endl;
-                    tablefile << "\\multicolumn{3}{c|}{optimization model}\t&\t";
                     break;
                 }
 
