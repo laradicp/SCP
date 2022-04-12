@@ -258,12 +258,12 @@ int Data::used(int j, int i, std::vector<int> &s, std::vector<double> &score, st
     return used(j, i - 1, s, score, jobsPerScore, familiesPerScore, intersection) + min;
 }
 
-std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<double> &score, std::vector<int> &jobsPerScore,
+void Data::calculateLB(int i, std::vector<int> &s, std::vector<double> &score, std::vector<int> &jobsPerScore,
     std::vector<std::vector<int>> &familiesPerScore, std::vector<std::vector<int>> &intersection)
 {
     if(lb[i] != -1)
     {
-        return s;
+        return;
     }
 
     if(i == 0)
@@ -292,7 +292,7 @@ std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<doubl
 
         lb[i] = jobsPerScore[i];
 
-        return s;
+        return;
     }
     
     calculateLB(i - 1, s, score, jobsPerScore, familiesPerScore, intersection);
@@ -411,7 +411,7 @@ std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<doubl
 
     lb[i] = lb[i - 1] + max;
 
-    return s;
+    return;
 }
 
 int Data::getLowerBound()
@@ -489,5 +489,9 @@ std::vector<int> Data::getLowerBoundSol()
         }
     }
     
-    return calculateLB(getCadencesSize(), s, score, jobsPerScore, familiesPerScore, intersection);
+    std::vector<int> familySizeReset = familySize;
+    calculateLB(getCadencesSize(), s, score, jobsPerScore, familiesPerScore, intersection);
+    familySize = familySizeReset;
+
+    return s;
 }

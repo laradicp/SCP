@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <iomanip>
+#include <filesystem>
 
 void getDual(std::string instanceSet, std::vector<std::pair<double, int>> &dual)
 {
@@ -138,10 +139,20 @@ void getMatrixObjTimeSet(std::string instanceSet, std::vector<std::vector<std::p
 
 bool compare(std::pair<double, int> p1, std::pair<double, int> p2) { return (p1.second<p2.second); }
 
+struct OptimalInfo{
+    int obj;
+    double time;
+    std::string path;
+};
+
 int main()
 {
     std::vector<std::string> versions{"al", "hl", "au", "balau", "baltu", "bhlau", "bhltu", "btlau", "btltu", "ial", "ihl", "itl", "iau", "itu", "f1", "f2"},
-        instancesSets = {"A", "B", "C", "D"};
+        folders{"", "heuristic/output/", "", "binary-algo-lb-algo-ub/benchmark/", "binary-algo-lb-trivial-ub/benchmark/", 
+        "binary-heuristic-lb-algo-ub/benchmark/", "binary-heuristic-lb-trivial-ub/benchmark/", "binary-trivial-lb-algo-ub/benchmark/",
+        "binary-trivial-lb-trivial-ub/benchmark/", "iterative-algo-lb/benchmark/", "iterative-heuristic-lb/benchmark/",
+        "iterative-trivial-lb/benchmark/", "iterative-algo-ub/benchmark/", "iterative-trivial-ub/benchmark/", "f1/benchmark/", "f2/benchmark/"},
+        instancesSets = {"A", "B", "C", "D"}, instancesNames;
     std::vector<std::vector<std::vector<std::vector<std::pair<double, int>>>>> matrixObjTime(16,
         std::vector<std::vector<std::vector<std::pair<double, int>>>>(4, std::vector<std::vector<std::pair<double, int>>>(2,
         std::vector<std::pair<double, int>>(0, std::make_pair(0, 0)))));
@@ -255,6 +266,7 @@ int main()
 
     std::vector<std::vector<int>> solved(16, std::vector<int>(4, 0));
     std::vector<std::vector<int>> optimal(16, std::vector<int>(4, 0));
+    std::vector<std::vector<OptimalInfo>> optimalInfo(4, std::vector<OptimalInfo>(193, {0, 1000, ""}));
     std::vector<std::vector<std::vector<double>>> gaps;
     std::vector<std::vector<double>> lowestGap(4, std::vector<double>(193, __DBL_MAX__));
     std::vector<std::vector<double>> gapSum(16, std::vector<double>(4, 0));
@@ -346,6 +358,14 @@ int main()
                 {
                     lowestGap[j][l] = gap;
                 }
+                
+                if(((i < 12)&&(i != 2) || (i > 2)&&(matrixObjTime[i][j][1][l].first < 600))&&
+                    (matrixObjTime[i][j][0][l].first > optimalInfo[j][l].obj ||
+                    (matrixObjTime[i][j][0][l].first == optimalInfo[j][l].obj)&&(matrixObjTime[i][j][1][l].first < optimalInfo[j][l].time))) {
+                    optimalInfo[j][l].obj = matrixObjTime[i][j][0][l].first;
+                    optimalInfo[j][l].time = matrixObjTime[i][j][1][l].first;
+                    optimalInfo[j][l].path = folders[i] + instancesSets[j] + "/";
+                }
 
                 gapsI[j].push_back(gap);
                 timeSum[i][j] += matrixObjTime[i][j][1][l].first;
@@ -367,6 +387,15 @@ int main()
     // std::cout << "mean size: " << sumSize/193.0 << std::endl;
     // std::cout << "median: " << median << std::endl;
 
+    // fill instancesNames
+    std::ifstream instancesNamesFile;
+    instancesNamesFile.open("instances-names");
+    for(int l = 0; l < 193; l++) {
+        std::string line;
+        getline(instancesNamesFile, line);
+        instancesNames.push_back(line);
+    }
+
     // optimals file
     for(int j = 0; j < 4; j++)
     {
@@ -384,6 +413,18 @@ int main()
             out <<  primal[j][l] << std::endl;
         }
         
+        out.close();
+    
+        for(int l = 0; l < noOfInstances; l++)
+        {
+            if(optimalInfo[j][l].path[0] == 'h') {
+                std::filesystem::copy(optimalInfo[j][l].path + instancesNames[l], "best-primal-sols/" + instancesSets[j] + "/" + instancesNames[l]);
+            }
+            else {
+                std::filesystem::copy(optimalInfo[j][l].path + "bm-" + std::to_string(l + 1), "best-primal-sols/" + instancesSets[j] + "/" + instancesNames[l]);
+            }
+        }
+
         out.close();
     }
 
