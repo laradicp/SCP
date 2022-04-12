@@ -491,6 +491,22 @@ int main(int argc, char** argv)
 
     int lb = 1, ub = data.getUpperBound();
     std::vector<int> s;
+
+    if(lb == ub) {
+        time = std::chrono::system_clock::now() - begin;
+        int sSize = s.size();
+        std::vector<int> iterFamily(data.getFamiliesSize(), 0);
+        for(int p = 0; p < sSize; p++)
+        {
+            int f = s[p];
+            std::cout << "Position " << p + 1 << ":\t";
+            std::cout << data.getFamilyMember(f, iterFamily[f]++) << std::endl;
+        }
+        std::cout << "Maximum profit:\t" << lb << std::endl;
+        std::cout << "Time:\t\t" << time.count() << std::endl;
+
+        return 0;
+    }
     
     std::cout << "start binary search" << std::endl;
     while(lb != ub)

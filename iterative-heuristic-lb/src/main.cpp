@@ -518,11 +518,13 @@ int main(int argc, char** argv)
     std::chrono::duration<double> time = std::chrono::system_clock::now() - begin;
     
     int lb = s.size();
+    bool useHeuristicSol = true;
     
     std::cout << "start iterative search (increment)" << std::endl;
     std::cout << "\tlb: " << ++lb << std::endl;
     while(solve(data, lb, s, time.count() + heuristicTime))
     {
+        useHeuristicSol = false;
         time = std::chrono::system_clock::now() - begin;
         if(time.count() + heuristicTime > 600)
         {
@@ -536,6 +538,21 @@ int main(int argc, char** argv)
     lb--;
 
     time = std::chrono::system_clock::now() - begin;
+
+    if(useHeuristicSol) {
+        int sSize = s.size();
+        std::vector<int> iterFamily(data.getFamiliesSize(), 0);
+        for(int p = 0; p < sSize; p++)
+        {
+            int f = s[p];
+            std::cout << "Position " << p + 1 << ":\t";
+            std::cout << data.getFamilyMember(f, iterFamily[f]++) << std::endl;
+        }
+        std::cout << "Maximum profit:\t" << lb << std::endl;
+        std::cout << "Time:\t\t" << time.count() + heuristicTime << std::endl;
+
+        return 0;
+    }
     
     int sSize = s.size();
     for(int p = 0; p < sSize; p++)

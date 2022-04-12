@@ -507,6 +507,22 @@ int main(int argc, char** argv)
     }
     lb--;
 
+    if(lb == data.getLowerBound()) {
+        time = std::chrono::system_clock::now() - begin;
+        int sSize = s.size();
+        std::vector<int> iterFamily(data.getFamiliesSize(), 0);
+        for(int p = 0; p < sSize; p++)
+        {
+            int f = s[p];
+            std::cout << "Position " << p + 1 << ":\t";
+            std::cout << data.getFamilyMember(f, iterFamily[f]++) << std::endl;
+        }
+        std::cout << "Maximum profit:\t" << lb << std::endl;
+        std::cout << "Time:\t\t" << time.count() << std::endl;
+
+        return 0;
+    }
+
     time = std::chrono::system_clock::now() - begin;
     
     int sSize = s.size();
