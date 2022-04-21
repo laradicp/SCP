@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <filesystem>
+#include "heuristic/src/Data.cpp"
 
 void getDual(std::string instanceSet, std::vector<std::pair<double, int>> &dual)
 {
@@ -265,7 +266,8 @@ int main()
     }
 
     std::vector<std::vector<int>> solved(16, std::vector<int>(4, 0));
-    std::vector<std::vector<int>> optimal(16, std::vector<int>(4, 0));
+    std::vector<std::vector<int>> numOfOptimals(16, std::vector<int>(4, 0));
+    std::vector<std::vector<bool>> optimal(4, std::vector<bool>(193, false));
     std::vector<std::vector<OptimalInfo>> optimalInfo(4, std::vector<OptimalInfo>(193, {0, 1000, ""}));
     std::vector<std::vector<std::vector<double>>> gaps;
     std::vector<std::vector<double>> lowestGap(4, std::vector<double>(193, __DBL_MAX__));
@@ -310,6 +312,11 @@ int main()
 
             for(int j = 0; j < 4; j++)
             {
+                if((i > 2)&&(matrixObjTime[i][j][1][l].first < 600))
+                {
+                    optimal[j][l] = true;
+                }
+
                 double gap;
 
                 if((i < 12)&&(i != 2))
@@ -348,12 +355,6 @@ int main()
 
                 gapSum[i][j] += gap;
 
-                if(gap == 0)
-                {
-                    optimal[i][j]++;
-                    timeOptSum[i][j] += matrixObjTime[i][j][1][l].first;
-                }
-
                 if(gap < lowestGap[j][l])
                 {
                     lowestGap[j][l] = gap;
@@ -390,13 +391,14 @@ int main()
     // fill instancesNames
     std::ifstream instancesNamesFile;
     instancesNamesFile.open("instances-names");
-    for(int l = 0; l < 193; l++) {
+    for(int l = 0; l < 193; l++)
+    {
         std::string line;
         getline(instancesNamesFile, line);
         instancesNames.push_back(line);
     }
 
-    // optimals file
+    // optimals and best primal solutions files
     for(int j = 0; j < 4; j++)
     {
         std::ofstream out;
@@ -410,22 +412,139 @@ int main()
 
         for(int l = 0; l < noOfInstances; l++)
         {
-            out <<  primal[j][l] << std::endl;
+            out <<  primal[j][l];
+
+            if(!optimal[j][l])
+            {
+                out <<  "*";
+            }
+
+            out << std::endl;
         }
         
         out.close();
     
         for(int l = 0; l < noOfInstances; l++)
         {
-            if(optimalInfo[j][l].path[0] == 'h') {
-                std::filesystem::copy(optimalInfo[j][l].path + instancesNames[l], "best-primal-sols/" + instancesSets[j] + "/" + instancesNames[l]);
+            Data data("instances/" + instancesSets[j] + "/" + instancesNames[l]);
+            
+            if(optimalInfo[j][l].path[0] == 'h')
+            {
+                std::ifstream in;
+                in.open(optimalInfo[j][l].path + instancesNames[l]);
+
+                if(!in.is_open())
+                {
+                    std::cout << "Problem opening best solution instance file for reading." << std::endl;
+                    exit(1);
+                }
+                
+                out.open("best-primal-sols/" + instancesSets[j] + "/" + instancesNames[l]);
+
+                if(!out.is_open())
+                {
+                    std::cout << "Problem opening best solution instance file for writing." << std::endl;
+                    exit(1);
+                }
+
+                double time;
+                in >> time;
+
+                out << optimalInfo[j][l].path.substr(0, optimalInfo[j][l].path.find("/")) << std::endl;
+                int p = 0, f;
+                std::vector<int> iterFamily(data.getFamiliesSize(), 0);
+                in >> f;
+                while(!in.eof())
+                {
+                    out << "Position " << ++p << ":\t" << data.getFamilyMember(f, iterFamily[f]++) << std::endl;
+                    in >> f;
+                }
+
+                out << "Maximum profit:\t" << p << std::endl;
+                out << "Time:\t" << time << std::endl;
+
+                in.close();
+                out.close();
             }
             else {
-                std::filesystem::copy(optimalInfo[j][l].path + "bm-" + std::to_string(l + 1), "best-primal-sols/" + instancesSets[j] + "/" + instancesNames[l]);
+                std::ifstream in;
+                in.open(optimalInfo[j][l].path + "bm-" + std::to_string(l + 1));
+
+                if(!in.is_open())
+                {
+                    std::cout << "Problem opening best solution instance file for reading." << std::endl;
+                    exit(1);
+                }
+                
+                std::string line;
+                std::vector<int> s;
+                while(getline(in, line))
+                {
+                    if(line.find("Position 1:") != std::string::npos)
+                    {
+                        s.push_back(line[line.size() - 1] - '0');
+                        break;
+                    }
+                }
+
+                while(getline(in, line))
+                {
+                    if(line.find("Position") == std::string::npos)
+                    {
+                        break;
+                    }
+                    
+                    s.push_back(line[line.size() - 1] - '0');
+                }
+
+                if(optimalInfo[j][l].path.find("heuristic") != std::string::npos ||
+                    optimalInfo[j][l].path.find("f2") != std::string::npos)
+                {
+                    std::vector<int> updatedS;    
+                    std::vector<int> iterFamily(data.getFamiliesSize(), 0);
+                    for(int p = 0; p < s.size(); p++)
+                    {
+                        if(s[p] >= data.getFamiliesSize())
+                        {
+                            break;
+                        }
+
+                        int v = data.getFamilyMember(s[p], iterFamily[s[p]]++);
+                        if(v == -1)
+                        {
+                            break;
+                        }
+                        updatedS.push_back(v);
+                    }
+
+                    if(updatedS.size() == s.size())
+                    {
+                        s = updatedS;
+                    }
+                }
+                
+                out.open("best-primal-sols/" + instancesSets[j] + "/" + instancesNames[l]);
+
+                if(!out.is_open())
+                {
+                    std::cout << "Problem opening best solution instance file for writing." << std::endl;
+                    exit(1);
+                }
+
+                out << optimalInfo[j][l].path.substr(0, optimalInfo[j][l].path.find("/")) << std::endl;
+                for(int p = 0; p < s.size(); p++)
+                {
+                    out << "Position " << p + 1 << ":\t" << s[p] << std::endl;
+                }
+
+                out << line << std::endl;
+                getline(in, line);
+                out << line << std::endl;
+
+                in.close();
+                out.close();
             }
         }
-
-        out.close();
     }
 
     // tables
@@ -510,22 +629,29 @@ int main()
                     tablefile << "\\multicolumn{1}{c|}{-}\t&\t";
                 }
             }
-            
-            // #primal
-            tablefile << solved[i][j] << "\t&\t";
 
-            // #optimal
-            tablefile << optimal[i][j] << "\t&\t";
-
-            // lowest gap
             int noOfLowestGaps = 0;
             for(int l = 0; l < noOfInstances; l++)
             {
                 if(gaps[i][j][l] == lowestGap[j][l])
                 {
                     noOfLowestGaps++;
+
+                    if(optimal[j][l])
+                    {
+                        numOfOptimals[i][j]++;
+                        timeOptSum[i][j] += matrixObjTime[i][j][1][l].first;
+                    }
                 }
             }
+            
+            // #primal
+            tablefile << solved[i][j] << "\t&\t";
+
+            // #optimal
+            tablefile << numOfOptimals[i][j] << "\t&\t";
+
+            // lowest gap
             tablefile << noOfLowestGaps << "\t&\t";
 
             // output
@@ -545,7 +671,7 @@ int main()
             tablefile << timeSum[i][j]/noOfInstances << "\t&\t";
 
             // time (optimal)
-            tablefile << timeOptSum[i][j]/optimal[i][j] << "\\\\" << std::endl;
+            tablefile << timeOptSum[i][j]/numOfOptimals[i][j] << "\\\\" << std::endl;
         }
 
         tablefile << "\\hline" << std::endl;
