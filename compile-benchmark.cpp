@@ -482,7 +482,7 @@ int main()
                 {
                     if(line.find("Position 1:") != std::string::npos)
                     {
-                        s.push_back(line[line.size() - 1] - '0');
+                        s.push_back(stoi(line.substr(line.find("\t") + 1)));
                         break;
                     }
                 }
@@ -494,7 +494,7 @@ int main()
                         break;
                     }
                     
-                    s.push_back(line[line.size() - 1] - '0');
+                    s.push_back(stoi(line.substr(line.find("\t") + 1)));
                 }
 
                 if(optimalInfo[j][l].path.find("heuristic") != std::string::npos ||
