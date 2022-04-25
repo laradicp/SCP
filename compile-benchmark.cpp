@@ -233,7 +233,10 @@ int main()
 
                     if((matrixObjTime[i][j][0][l].first < dual[j][l].first)&&(matrixObjTime[i][j][1][l].first < 600))
                     {
-                        dual[j][l].first = matrixObjTime[i][j][0][l].first;
+                        // check if the instance is not the one solved linearly
+                        if(i != 14 || j != 2 || l != 187) {
+                            dual[j][l].first = matrixObjTime[i][j][0][l].first;
+                        }
                     }
                 }
                 else
@@ -314,7 +317,10 @@ int main()
             {
                 if((i > 2)&&(matrixObjTime[i][j][1][l].first < 600))
                 {
-                    optimal[j][l] = true;
+                    // check if the instance is not the one solved linearly by F1
+                    if(i != 14 || j != 2 || l != 187) {
+                        optimal[j][l] = true;
+                    }
                 }
 
                 double gap;
