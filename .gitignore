@@ -17,6 +17,7 @@ output/
 benchmark/
 
 compile-benchmark
+compile-heuristic-output
 compile-heuristic-calibration
 scp-heuristic
 violations.ods

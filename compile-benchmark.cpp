@@ -553,7 +553,7 @@ int main()
         }
     }
 
-    // tables
+    // latex tables
     for(int j = 0; j < 4; j++)
     {
         std::ofstream tablefile;
@@ -683,6 +683,30 @@ int main()
         tablefile << "\\hline" << std::endl;
 
         tablefile.close();
+    }
+
+    // csv tables
+    for(int j = 0; j < 4; j++) {
+        std::ofstream tablefile;
+        tablefile.open("tables/obj-time-" + instancesSets[j]);
+
+        if(!tablefile.is_open())
+        {
+            std::cout << "Problem opening table file for writing." << std::endl;
+            exit(1);
+        }
+
+        for(int l = 0; l < noOfInstances; l++)
+        {
+            for(int i = 0; i < 14; i++)
+            {
+                tablefile << matrixObjTime[i][j][0][l].first <<  "\t" << matrixObjTime[i][j][1][l].first << "\t";
+            }
+            tablefile << dualF1[j][l].first << "\t" << matrixObjTime[14][j][1][l].first << "\t";
+            tablefile << dualF2[j][l].first << "\t" << matrixObjTime[14][j][1][l].first << "\t";
+            tablefile << primal[j][l] << "\t" << dual[j][l].first << "\t";
+            tablefile << std::endl;
+        }
     }
 
     return 0;
