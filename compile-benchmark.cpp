@@ -713,14 +713,14 @@ int main()
 
         for(int l = 0; l < noOfInstances; l++)
         {
+            tablefile << instancesNames[l].first << "\t";
             for(int i = 0; i < 14; i++)
             {
                 tablefile << matrixObjTime[i][j][0][l].first <<  "\t" << matrixObjTime[i][j][1][l].first << "\t";
             }
             tablefile << dualF1[j][l].first << "\t" << matrixObjTime[14][j][1][l].first << "\t";
             tablefile << dualF2[j][l].first << "\t" << matrixObjTime[14][j][1][l].first << "\t";
-            tablefile << primal[j][l] << "\t" << dual[j][l].first << "\t";
-            tablefile << std::endl;
+            tablefile << primal[j][l] << "\t" << dual[j][l].first << std::endl;
         }
     }
 
