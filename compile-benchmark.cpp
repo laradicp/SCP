@@ -138,7 +138,9 @@ void getMatrixObjTimeSet(std::string instanceSet, std::vector<std::vector<std::p
     timefile.close();
 }
 
-bool compare(std::pair<double, int> p1, std::pair<double, int> p2) { return (p1.second<p2.second); }
+bool compareIntInt(std::pair<int, int> p1, std::pair<int, int> p2) { return (p1.second <= p2.second); }
+bool compareDoubleInt(std::pair<double, int> p1, std::pair<double, int> p2) { return (p1.second <= p2.second); }
+bool compareStringInt(std::pair<std::string, int> p1, std::pair<std::string, int> p2) { return (p1.second <= p2.second); }
 
 struct OptimalInfo{
     int obj;
@@ -153,7 +155,7 @@ int main()
         "binary-heuristic-lb-algo-ub/benchmark/", "binary-heuristic-lb-trivial-ub/benchmark/", "binary-trivial-lb-algo-ub/benchmark/",
         "binary-trivial-lb-trivial-ub/benchmark/", "iterative-algo-lb/benchmark/", "iterative-heuristic-lb/benchmark/",
         "iterative-trivial-lb/benchmark/", "iterative-algo-ub/benchmark/", "iterative-trivial-ub/benchmark/", "f1/benchmark/", "f2/benchmark/"},
-        instancesSets = {"A", "B", "C", "D"}, instancesNames;
+        instancesSets = {"A", "B", "C", "D"};
     std::vector<std::vector<std::vector<std::vector<std::pair<double, int>>>>> matrixObjTime(16,
         std::vector<std::vector<std::vector<std::pair<double, int>>>>(4, std::vector<std::vector<std::pair<double, int>>>(2,
         std::vector<std::pair<double, int>>(0, std::make_pair(0, 0)))));
@@ -172,7 +174,7 @@ int main()
 
             for(int k = 0; k < 2; k++)
             {
-                // std::sort(matrixObjTime[i][j][k].begin(), matrixObjTime[i][j][k].end(), compare);
+                std::sort(matrixObjTime[i][j][k].begin(), matrixObjTime[i][j][k].end(), compareDoubleInt);
                 
                 std::cout << "\t" << k << ":\n\t\t";
                 for(int l = 0; l < noOfInstances; l++)
@@ -183,6 +185,25 @@ int main()
             }
         }
     }
+
+    // fill instancesNames
+    std::vector<std::pair<std::string, int>> instancesNames;
+    std::vector<std::pair<int, int>> instancesIDs;
+    std::ifstream instancesNamesFile, dimensionsFile;
+    instancesNamesFile.open("instances-names");
+    dimensionsFile.open("instances-dimension");
+    for(int l = 0; l < noOfInstances; l++)
+    {
+        std::string line;
+        int dimension;
+        getline(instancesNamesFile, line);
+        dimensionsFile >> dimension;
+        instancesNames.push_back(std::make_pair(line, dimension));
+        instancesIDs.push_back(std::make_pair(l + 1, dimension));
+    }
+
+    std::sort(instancesNames.begin(), instancesNames.end(), compareStringInt);
+    std::sort(instancesIDs.begin(), instancesIDs.end(), compareIntInt);
 
     for(int l = 0; l < noOfInstances; l++)
     {
@@ -197,7 +218,8 @@ int main()
     {
         getDual(versions[14] + instancesSets[j], dualF1[j]);
         getDual(versions[15] + instancesSets[j], dualF2[j]);
-        // std::sort(dualPure[j].begin(), dualPure[j].end(), compare);
+        std::sort(dualF1[j].begin(), dualF1[j].end(), compareDoubleInt);
+        std::sort(dualF2[j].begin(), dualF2[j].end(), compareDoubleInt);
         dual[j] = dualF2[j];
 
         std::cout << "\t" << instancesSets[j] << ":\n\t\t";
@@ -233,8 +255,8 @@ int main()
 
                     if((matrixObjTime[i][j][0][l].first < dual[j][l].first)&&(matrixObjTime[i][j][1][l].first < 600))
                     {
-                        // check if the instance is not the one solved linearly
-                        if(i != 14 || j != 2 || l != 187) {
+                        // check if the instance is not the one solved linearly by F1
+                        if(i != 14 || j != 2 || l != 191) {
                             dual[j][l].first = matrixObjTime[i][j][0][l].first;
                         }
                     }
@@ -270,10 +292,10 @@ int main()
 
     std::vector<std::vector<int>> solved(16, std::vector<int>(4, 0));
     std::vector<std::vector<int>> numOfOptimals(16, std::vector<int>(4, 0));
-    std::vector<std::vector<bool>> optimal(4, std::vector<bool>(193, false));
-    std::vector<std::vector<OptimalInfo>> optimalInfo(4, std::vector<OptimalInfo>(193, {0, 1000, ""}));
+    std::vector<std::vector<bool>> optimal(4, std::vector<bool>(noOfInstances, false));
+    std::vector<std::vector<OptimalInfo>> optimalInfo(4, std::vector<OptimalInfo>(noOfInstances, {0, 1000, ""}));
     std::vector<std::vector<std::vector<double>>> gaps;
-    std::vector<std::vector<double>> lowestGap(4, std::vector<double>(193, __DBL_MAX__));
+    std::vector<std::vector<double>> lowestGap(4, std::vector<double>(noOfInstances, __DBL_MAX__));
     std::vector<std::vector<double>> gapSum(16, std::vector<double>(4, 0));
     std::vector<std::vector<double>> timeSum(16, std::vector<double>(4, 0));
     std::vector<std::vector<double>> timeOptSum(16, std::vector<double>(4, 0));
@@ -318,7 +340,7 @@ int main()
                 if((i > 2)&&(matrixObjTime[i][j][1][l].first < 600))
                 {
                     // check if the instance is not the one solved linearly by F1
-                    if(i != 14 || j != 2 || l != 187) {
+                    if(i != 14 || j != 2 || l != 191) {
                         optimal[j][l] = true;
                     }
                 }
@@ -391,18 +413,11 @@ int main()
         timefile.close();
     }
 
-    // std::cout << "mean size: " << sumSize/193.0 << std::endl;
-    // std::cout << "median: " << median << std::endl;
+    std::cout << "average size: " << sumSize/(float)noOfInstances << std::endl;
+    std::cout << "median: " << median << std::endl;
 
-    // fill instancesNames
-    std::ifstream instancesNamesFile;
-    instancesNamesFile.open("instances-names");
-    for(int l = 0; l < 193; l++)
-    {
-        std::string line;
-        getline(instancesNamesFile, line);
-        instancesNames.push_back(line);
-    }
+    instancesNamesFile.close();
+    dimensionsFile.close();
 
     // optimals and best primal solutions files
     for(int j = 0; j < 4; j++)
@@ -432,12 +447,12 @@ int main()
     
         for(int l = 0; l < noOfInstances; l++)
         {
-            Data data("instances/" + instancesSets[j] + "/" + instancesNames[l]);
+            Data data("instances/" + instancesSets[j] + "/" + instancesNames[l].first);
             
             if(optimalInfo[j][l].path[0] == 'h')
             {
                 std::ifstream in;
-                in.open(optimalInfo[j][l].path + instancesNames[l]);
+                in.open(optimalInfo[j][l].path + instancesNames[l].first);
 
                 if(!in.is_open())
                 {
@@ -445,7 +460,7 @@ int main()
                     exit(1);
                 }
                 
-                out.open("best-primal-sols/" + instancesSets[j] + "/" + instancesNames[l]);
+                out.open("results/best-primal-sols/" + instancesSets[j] + "/" + instancesNames[l].first);
 
                 if(!out.is_open())
                 {
@@ -474,7 +489,7 @@ int main()
             }
             else {
                 std::ifstream in;
-                in.open(optimalInfo[j][l].path + "bm-" + std::to_string(l + 1));
+                in.open(optimalInfo[j][l].path + "bm-" + std::to_string(instancesIDs[l].first));
 
                 if(!in.is_open())
                 {
@@ -529,7 +544,7 @@ int main()
                     }
                 }
                 
-                out.open("best-primal-sols/" + instancesSets[j] + "/" + instancesNames[l]);
+                out.open("results/best-primal-sols/" + instancesSets[j] + "/" + instancesNames[l].first);
 
                 if(!out.is_open())
                 {
