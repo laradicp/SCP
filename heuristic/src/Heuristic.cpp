@@ -406,8 +406,6 @@ void removalCL(vector<int> &s, Data &data, int beginSearch, int endSearch, vecto
         }
     }
 
-    sort(feasiblePositions.begin(), feasiblePositions.end());
-
     return;
 }
 
