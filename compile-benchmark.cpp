@@ -7,17 +7,19 @@
 #include <filesystem>
 #include "heuristic/src/Data.cpp"
 
-void getDual(std::string instanceSet, std::vector<std::pair<double, int>> &dual)
+using namespace std;
+
+void getDual(string instanceSet, vector<pair<double, int>> &dual)
 {
-    std::string filepath = "objval/objval-dual-" + instanceSet;
-    std::ifstream file, dimensionfile;
-    std::vector<int> dimensions;
+    string filepath = "objval/objval-dual-" + instanceSet;
+    ifstream file, dimensionfile;
+    vector<int> dimensions;
 
     dimensionfile.open("instances-dimension");
 
     if(!dimensionfile.is_open())
     {
-        std::cout << "Problem opening dimension file for reading." << std::endl;
+        cout << "Problem opening dimension file for reading." << endl;
         exit(1);
     }
 
@@ -38,18 +40,18 @@ void getDual(std::string instanceSet, std::vector<std::pair<double, int>> &dual)
 
     if(!file.is_open())
     {
-        std::cout << "Problem opening dual file for reading." << std::endl;
+        cout << "Problem opening dual file for reading." << endl;
         exit(1);
     }
 
-    std::string line;
-    std::getline(file, line, ':');
+    string line;
+    getline(file, line, ':');
 
     int i = 0;
     while(1)
     {
-        std::getline(file, line, ':');
-        dual.push_back(std::make_pair(std::stod(line), dimensions[i++]));
+        getline(file, line, ':');
+        dual.push_back(make_pair(stod(line), dimensions[i++]));
 
         if(file.eof())
         {
@@ -60,18 +62,18 @@ void getDual(std::string instanceSet, std::vector<std::pair<double, int>> &dual)
     file.close();
 }
 
-void getMatrixObjTimeSet(std::string instanceSet, std::vector<std::vector<std::pair<double, int>>> &matrixObjTimeSet)
+void getMatrixObjTimeSet(string instanceSet, vector<vector<pair<double, int>>> &matrixObjTimeSet)
 {
-    std::string objvalfilepath = "objval/objval-" + instanceSet;
-    std::string timefilepath = "time/time-" + instanceSet;
-    std::ifstream objvalfile, timefile, dimensionfile;
-    std::vector<int> dimensions;
+    string objvalfilepath = "objval/objval-" + instanceSet;
+    string timefilepath = "time/time-" + instanceSet;
+    ifstream objvalfile, timefile, dimensionfile;
+    vector<int> dimensions;
 
     dimensionfile.open("instances-dimension");
 
     if(!dimensionfile.is_open())
     {
-        std::cout << "Problem opening dimension file for reading." << std::endl;
+        cout << "Problem opening dimension file for reading." << endl;
         exit(1);
     }
 
@@ -92,18 +94,18 @@ void getMatrixObjTimeSet(std::string instanceSet, std::vector<std::vector<std::p
 
     if(!objvalfile.is_open())
     {
-        std::cout << "Problem opening objval file for reading." << std::endl;
+        cout << "Problem opening objval file for reading." << endl;
         exit(1);
     }
 
-    std::string line;
-    std::getline(objvalfile, line, ':');
+    string line;
+    getline(objvalfile, line, ':');
 
     int i = 0;
     while(1)
     {
-        std::getline(objvalfile, line, ':');
-        matrixObjTimeSet[0].push_back(std::make_pair(std::stod(line), dimensions[i++]));
+        getline(objvalfile, line, ':');
+        matrixObjTimeSet[0].push_back(make_pair(stod(line), dimensions[i++]));
 
         if(objvalfile.eof())
         {
@@ -117,17 +119,17 @@ void getMatrixObjTimeSet(std::string instanceSet, std::vector<std::vector<std::p
 
     if(!timefile.is_open())
     {
-        std::cout << "Problem opening time file for reading." << std::endl;
+        cout << "Problem opening time file for reading." << endl;
         exit(1);
     }
 
-    std::getline(timefile, line, ':');
+    getline(timefile, line, ':');
 
     i = 0;
     while(1)
     {
-        std::getline(timefile, line, ':');
-        matrixObjTimeSet[1].push_back(std::make_pair(std::stod(line), dimensions[i++]));
+        getline(timefile, line, ':');
+        matrixObjTimeSet[1].push_back(make_pair(stod(line), dimensions[i++]));
 
         if(timefile.eof())
         {
@@ -138,92 +140,107 @@ void getMatrixObjTimeSet(std::string instanceSet, std::vector<std::vector<std::p
     timefile.close();
 }
 
-bool compareIntInt(std::pair<int, int> p1, std::pair<int, int> p2) { return (p1.second <= p2.second); }
-bool compareDoubleInt(std::pair<double, int> p1, std::pair<double, int> p2) { return (p1.second <= p2.second); }
-bool compareStringInt(std::pair<std::string, int> p1, std::pair<std::string, int> p2) { return (p1.second <= p2.second); }
+bool compareIntInt(pair<int, int> p1, pair<int, int> p2) { return (p1.second <= p2.second); }
+bool compareDoubleInt(pair<double, int> p1, pair<double, int> p2) { return (p1.second <= p2.second); }
+bool compareStringInt(pair<string, int> p1, pair<string, int> p2) { return (p1.second <= p2.second); }
 
 struct OptimalInfo{
     int obj;
     double time;
-    std::string path;
+    string path;
 };
 
 int main()
 {
-    std::vector<std::string> versions{"al", "hl", "au", "balau", "baltu", "bhlau", "bhltu", "btlau", "btltu", "ial", "ihl", "itl", "iau", "itu", "f1", "f2"},
+    vector<string> versions{"al", "hl", "au", "balau", "baltu", "bhlau", "bhltu", "btlau", "btltu", "ial", "ihl", "itl", "iau", "itu", "f1", "f2"},
         folders{"", "heuristic/output/", "", "binary-algo-lb-algo-ub/benchmark/", "binary-algo-lb-trivial-ub/benchmark/", 
         "binary-heuristic-lb-algo-ub/benchmark/", "binary-heuristic-lb-trivial-ub/benchmark/", "binary-trivial-lb-algo-ub/benchmark/",
         "binary-trivial-lb-trivial-ub/benchmark/", "iterative-algo-lb/benchmark/", "iterative-heuristic-lb/benchmark/",
         "iterative-trivial-lb/benchmark/", "iterative-algo-ub/benchmark/", "iterative-trivial-ub/benchmark/", "f1/benchmark/", "f2/benchmark/"},
         instancesSets = {"A", "B", "C", "D"};
-    std::vector<std::vector<std::vector<std::vector<std::pair<double, int>>>>> matrixObjTime(16,
-        std::vector<std::vector<std::vector<std::pair<double, int>>>>(4, std::vector<std::vector<std::pair<double, int>>>(2,
-        std::vector<std::pair<double, int>>(0, std::make_pair(0, 0)))));
-    std::vector<std::vector<std::pair<double, int>>> dual(4, std::vector<std::pair<double, int>>(0, std::make_pair(0, 0))),
-        dualF1(4, std::vector<std::pair<double, int>>(0, std::make_pair(0, 0))), dualF2(4, std::vector<std::pair<double, int>>(0, std::make_pair(0, 0)));
-    int noOfInstances, sumSize, median;
+    vector<vector<vector<vector<pair<double, int>>>>> matrixObjTime(16,
+        vector<vector<vector<pair<double, int>>>>(4, vector<vector<pair<double, int>>>(2,
+        vector<pair<double, int>>(0, make_pair(0, 0)))));
+    vector<vector<pair<double, int>>> dual(4, vector<pair<double, int>>(0, make_pair(0, 0))),
+        dualF1(4, vector<pair<double, int>>(0, make_pair(0, 0))), dualF2(4, vector<pair<double, int>>(0, make_pair(0, 0)));
+    int numOfInstances, sumSize, median;
 
     for(int j = 0; j < 4; j++)
     {
         for(int i = 0; i < 16; i++)
         {
-            std::cout << versions[i] << instancesSets[j] << std::endl << std::endl;
+            cout << versions[i] << instancesSets[j] << endl << endl;
             getMatrixObjTimeSet(versions[i] + instancesSets[j], matrixObjTime[i][j]);
             
-            noOfInstances = matrixObjTime[i][j][0].size();
+            numOfInstances = matrixObjTime[i][j][0].size();
 
             for(int k = 0; k < 2; k++)
             {
-                std::sort(matrixObjTime[i][j][k].begin(), matrixObjTime[i][j][k].end(), compareDoubleInt);
+                sort(matrixObjTime[i][j][k].begin(), matrixObjTime[i][j][k].end(), compareDoubleInt);
                 
-                std::cout << "\t" << k << ":\n\t\t";
-                for(int l = 0; l < noOfInstances; l++)
+                cout << "\t" << k << ":\n\t\t";
+                for(int l = 0; l < numOfInstances; l++)
                 {
-                    std::cout << matrixObjTime[i][j][k][l].first << "  ";
+                    cout << matrixObjTime[i][j][k][l].first << "  ";
                 }
-                std::cout << std::endl << std::endl;
+                cout << endl << endl;
             }
         }
     }
 
-    // fill instancesNames
-    std::vector<std::pair<std::string, int>> instancesNames;
-    std::vector<std::pair<int, int>> instancesIDs;
-    std::ifstream instancesNamesFile, dimensionsFile;
+    // fill instancesNames and instancesIDs
+    vector<pair<string, int>> instancesNames;
+    vector<pair<int, int>> instancesIDs;
+    ifstream instancesNamesFile, dimensionsFile;
     instancesNamesFile.open("instances-names");
+
+    if(!instancesNamesFile.is_open()) {
+        cout << "Problem opening instances names file for reading." << endl;
+        exit(1);
+    }
+
     dimensionsFile.open("instances-dimension");
-    for(int l = 0; l < noOfInstances; l++)
+
+    if(!dimensionsFile.is_open()) {
+        cout << "Problem opening dimensions file for reading." << endl;
+        exit(1);
+    }
+
+    for(int l = 0; l < numOfInstances; l++)
     {
-        std::string line;
+        string line;
         int dimension;
         getline(instancesNamesFile, line);
         dimensionsFile >> dimension;
-        instancesNames.push_back(std::make_pair(line, dimension));
-        instancesIDs.push_back(std::make_pair(l + 1, dimension));
+        instancesNames.push_back(make_pair(line, dimension));
+        instancesIDs.push_back(make_pair(l + 1, dimension));
     }
 
-    std::sort(instancesNames.begin(), instancesNames.end(), compareStringInt);
-    std::sort(instancesIDs.begin(), instancesIDs.end(), compareIntInt);
+    sort(instancesNames.begin(), instancesNames.end(), compareStringInt);
+    sort(instancesIDs.begin(), instancesIDs.end(), compareIntInt);
 
-    for(int l = 0; l < noOfInstances; l++)
+    instancesNamesFile.close();
+    dimensionsFile.close();
+
+    for(int l = 0; l < numOfInstances; l++)
     {
         sumSize += matrixObjTime[0][0][0][l].second;
     }
     median = matrixObjTime[0][0][0][96].second;
 
-    std::vector<std::vector<int>> primal(4, std::vector<int>(noOfInstances, 0));
+    vector<vector<int>> primal(4, vector<int>(numOfInstances, 0));
 
-    std::cout << "dual:" << std::endl << std::endl;
+    cout << "dual:" << endl << endl;
     for(int j = 0; j < 4; j++)
     {
         getDual(versions[14] + instancesSets[j], dualF1[j]);
         getDual(versions[15] + instancesSets[j], dualF2[j]);
-        std::sort(dualF1[j].begin(), dualF1[j].end(), compareDoubleInt);
-        std::sort(dualF2[j].begin(), dualF2[j].end(), compareDoubleInt);
+        sort(dualF1[j].begin(), dualF1[j].end(), compareDoubleInt);
+        sort(dualF2[j].begin(), dualF2[j].end(), compareDoubleInt);
         dual[j] = dualF2[j];
 
-        std::cout << "\t" << instancesSets[j] << ":\n\t\t";
-        for(int l = 0; l < noOfInstances; l++)
+        cout << "\t" << instancesSets[j] << ":\n\t\t";
+        for(int l = 0; l < numOfInstances; l++)
         {
             if(dualF1[j][l].first < dual[j][l].first)
             {
@@ -277,57 +294,57 @@ int main()
 
             if(dual[j][l].first < primal[j][l])
             {
-                std::cout << std::endl << std::endl << "ERROR:" << std::endl;
-                std::cout << "\tdual: " << dual[j][l].first << std::endl;
-                std::cout << "\tprimal: " << primal[j][l] << std::endl;
+                cout << endl << endl << "ERROR:" << endl;
+                cout << "\tdual: " << dual[j][l].first << endl;
+                cout << "\tprimal: " << primal[j][l] << endl;
                 dual[j][l].first = primal[j][l];
-                std::cout << "\t" << instancesSets[j] << ": " << l + 1 << std::endl;
+                cout << "\t" << instancesSets[j] << ": " << l + 1 << endl;
                 exit(1);
             }
 
-            std::cout << dual[j][l].first << "  ";
+            cout << dual[j][l].first << "  ";
         }
-        std::cout << std::endl << std::endl;
+        cout << endl << endl;
     }
 
-    std::vector<std::vector<int>> solved(16, std::vector<int>(4, 0));
-    std::vector<std::vector<int>> numOfOptimals(16, std::vector<int>(4, 0));
-    std::vector<std::vector<bool>> optimal(4, std::vector<bool>(noOfInstances, false));
-    std::vector<std::vector<OptimalInfo>> optimalInfo(4, std::vector<OptimalInfo>(noOfInstances, {0, 1000, ""}));
-    std::vector<std::vector<std::vector<double>>> gaps;
-    std::vector<std::vector<double>> lowestGap(4, std::vector<double>(noOfInstances, __DBL_MAX__));
-    std::vector<std::vector<double>> gapSum(16, std::vector<double>(4, 0));
-    std::vector<std::vector<double>> timeSum(16, std::vector<double>(4, 0));
-    std::vector<std::vector<double>> timeOptSum(16, std::vector<double>(4, 0));
+    vector<vector<int>> solved(16, vector<int>(4, 0));
+    vector<vector<int>> numOfOptimals(16, vector<int>(4, 0));
+    vector<vector<bool>> optimal(4, vector<bool>(numOfInstances, false));
+    vector<vector<OptimalInfo>> optimalInfo(4, vector<OptimalInfo>(numOfInstances, {0, 1000, ""}));
+    vector<vector<vector<double>>> gaps;
+    vector<vector<double>> lowestGap(4, vector<double>(numOfInstances, __DBL_MAX__));
+    vector<vector<double>> gapSum(16, vector<double>(4, 0));
+    vector<vector<double>> timeSum(16, vector<double>(4, 0));
+    vector<vector<double>> timeOptSum(16, vector<double>(4, 0));
 
-    // graphs and setup
+    // graphs for each version and setup
     for(int i = 0; i < 16; i++)
     {
-        std::ofstream gapfile;
+        ofstream gapfile;
 
         gapfile.open("graphs/gap/" + versions[i]);
 
         if(!gapfile.is_open())
         {
-            std::cout << "Problem opening gap file for writing." << std::endl;
+            cout << "Problem opening gap file for writing." << endl;
             exit(1);
         }
 
-        std::ofstream timefile;
+        ofstream timefile;
 
         timefile.open("graphs/time/" + versions[i]);
 
         if(!timefile.is_open())
         {
-            std::cout << "Problem opening time file for writing." << std::endl;
+            cout << "Problem opening time file for writing." << endl;
             exit(1);
         }
 
-        gapfile << "n\t&\tA\t&\tB\t&\tC\t&\tD" << std::endl;
-        timefile << "n\t&\tA\t&\tB\t&\tC\t&\tD" << std::endl;
+        gapfile << "n\t&\tA\t&\tB\t&\tC\t&\tD" << endl;
+        timefile << "n\t&\tA\t&\tB\t&\tC\t&\tD" << endl;
 
-        std::vector<std::vector<double>> gapsI(4, std::vector<double>(0, 0));
-        for(int l = 0; l < noOfInstances; l++)
+        vector<vector<double>> gapsI(4, vector<double>(0, 0));
+        for(int l = 0; l < numOfInstances; l++)
         {
             if((l+1)%10 == 0)
             {
@@ -403,8 +420,8 @@ int main()
                 timefile << "\t&\t" << matrixObjTime[i][j][1][l].first;
             }
 
-            gapfile << std::endl;
-            timefile << std::endl;
+            gapfile << endl;
+            timefile << endl;
         }
 
         gaps.push_back(gapsI);
@@ -413,25 +430,59 @@ int main()
         timefile.close();
     }
 
-    std::cout << "average size: " << sumSize/(float)noOfInstances << std::endl;
-    std::cout << "median: " << median << std::endl;
+    // gap and time graphs for each instance set
+    for(int j = 0; j < 4; j++) {
+        ofstream gapfile;
 
-    instancesNamesFile.close();
-    dimensionsFile.close();
+        gapfile.open("graphs/gap/" + instancesSets[j]);
+
+        if(!gapfile.is_open())
+        {
+            cout << "Problem opening gap file for writing." << endl;
+            exit(1);
+        }
+
+        ofstream timefile;
+
+        timefile.open("graphs/time/" + instancesSets[j]);
+
+        if(!timefile.is_open())
+        {
+            cout << "Problem opening time file for writing." << endl;
+            exit(1);
+        }
+
+        for(int i = 0; i < 16; i++) {
+            gapfile << versions[i] << endl;
+            timefile << versions[i] << endl;
+            for(int l = 0; l < numOfInstances; l++) {
+                gapfile << "(" << l + 1 << "," << gaps[i][j][l] << ")";
+                timefile << "(" << l + 1 << "," << matrixObjTime[i][j][1][l].first << ")";
+            }
+            gapfile << endl << endl;
+            timefile << endl << endl;
+        }
+
+        gapfile.close();
+        timefile.close();
+    }
+
+    cout << "average size: " << sumSize/(float)numOfInstances << endl;
+    cout << "median: " << median << endl;
 
     // optimals and best primal solutions files
     for(int j = 0; j < 4; j++)
     {
-        std::ofstream out;
+        ofstream out;
         out.open("optimals" + instancesSets[j]);
 
         if(!out.is_open())
         {
-            std::cout << "Problem opening optimals file for writing." << std::endl;
+            cout << "Problem opening optimals file for writing." << endl;
             exit(1);
         }
 
-        for(int l = 0; l < noOfInstances; l++)
+        for(int l = 0; l < numOfInstances; l++)
         {
             out <<  primal[j][l];
 
@@ -440,23 +491,23 @@ int main()
                 out <<  "*";
             }
 
-            out << std::endl;
+            out << endl;
         }
         
         out.close();
     
-        for(int l = 0; l < noOfInstances; l++)
+        for(int l = 0; l < numOfInstances; l++)
         {
             Data data("instances/" + instancesSets[j] + "/" + instancesNames[l].first);
             
             if(optimalInfo[j][l].path[0] == 'h')
             {
-                std::ifstream in;
+                ifstream in;
                 in.open(optimalInfo[j][l].path + instancesNames[l].first);
 
                 if(!in.is_open())
                 {
-                    std::cout << "Problem opening best solution instance file for reading." << std::endl;
+                    cout << "Problem opening best solution instance file for reading." << endl;
                     exit(1);
                 }
                 
@@ -464,44 +515,44 @@ int main()
 
                 if(!out.is_open())
                 {
-                    std::cout << "Problem opening best solution instance file for writing." << std::endl;
+                    cout << "Problem opening best solution instance file for writing." << endl;
                     exit(1);
                 }
 
                 double time;
                 in >> time;
 
-                out << optimalInfo[j][l].path.substr(0, optimalInfo[j][l].path.find("/")) << std::endl;
+                out << optimalInfo[j][l].path.substr(0, optimalInfo[j][l].path.find("/")) << endl;
                 int p = 0, f;
-                std::vector<int> iterFamily(data.getFamiliesSize(), 0);
+                vector<int> iterFamily(data.getFamiliesSize(), 0);
                 in >> f;
                 while(!in.eof())
                 {
-                    out << "Position " << ++p << ":\t" << data.getFamilyMember(f, iterFamily[f]++) << std::endl;
+                    out << "Position " << ++p << ":\t" << data.getFamilyMember(f, iterFamily[f]++) << endl;
                     in >> f;
                 }
 
-                out << "Maximum profit:\t" << p << std::endl;
-                out << "Time:\t" << time << std::endl;
+                out << "Maximum profit:\t" << p << endl;
+                out << "Time:\t" << time << endl;
 
                 in.close();
                 out.close();
             }
             else {
-                std::ifstream in;
-                in.open(optimalInfo[j][l].path + "bm-" + std::to_string(instancesIDs[l].first));
+                ifstream in;
+                in.open(optimalInfo[j][l].path + "bm-" + to_string(instancesIDs[l].first));
 
                 if(!in.is_open())
                 {
-                    std::cout << "Problem opening best solution instance file for reading." << std::endl;
+                    cout << "Problem opening best solution instance file for reading." << endl;
                     exit(1);
                 }
                 
-                std::string line;
-                std::vector<int> s;
+                string line;
+                vector<int> s;
                 while(getline(in, line))
                 {
-                    if(line.find("Position 1:") != std::string::npos)
+                    if(line.find("Position 1:") != string::npos)
                     {
                         s.push_back(stoi(line.substr(line.find("\t") + 1)));
                         break;
@@ -510,7 +561,7 @@ int main()
 
                 while(getline(in, line))
                 {
-                    if(line.find("Position") == std::string::npos)
+                    if(line.find("Position") == string::npos)
                     {
                         break;
                     }
@@ -518,11 +569,11 @@ int main()
                     s.push_back(stoi(line.substr(line.find("\t") + 1)));
                 }
 
-                if(optimalInfo[j][l].path.find("heuristic") != std::string::npos ||
-                    optimalInfo[j][l].path.find("f2") != std::string::npos)
+                if(optimalInfo[j][l].path.find("heuristic") != string::npos ||
+                    optimalInfo[j][l].path.find("f2") != string::npos)
                 {
-                    std::vector<int> updatedS;    
-                    std::vector<int> iterFamily(data.getFamiliesSize(), 0);
+                    vector<int> updatedS;    
+                    vector<int> iterFamily(data.getFamiliesSize(), 0);
                     for(int p = 0; p < s.size(); p++)
                     {
                         if(s[p] >= data.getFamiliesSize())
@@ -548,19 +599,19 @@ int main()
 
                 if(!out.is_open())
                 {
-                    std::cout << "Problem opening best solution instance file for writing." << std::endl;
+                    cout << "Problem opening best solution instance file for writing." << endl;
                     exit(1);
                 }
 
-                out << optimalInfo[j][l].path.substr(0, optimalInfo[j][l].path.find("/")) << std::endl;
+                out << optimalInfo[j][l].path.substr(0, optimalInfo[j][l].path.find("/")) << endl;
                 for(int p = 0; p < s.size(); p++)
                 {
-                    out << "Position " << p + 1 << ":\t" << s[p] << std::endl;
+                    out << "Position " << p + 1 << ":\t" << s[p] << endl;
                 }
 
-                out << line << std::endl;
+                out << line << endl;
                 getline(in, line);
-                out << line << std::endl;
+                out << line << endl;
 
                 in.close();
                 out.close();
@@ -571,21 +622,21 @@ int main()
     // latex tables
     for(int j = 0; j < 4; j++)
     {
-        std::ofstream tablefile;
+        ofstream tablefile;
         tablefile.open("tables/table" + instancesSets[j]);
 
         if(!tablefile.is_open())
         {
-            std::cout << "Problem opening table file for writing." << std::endl;
+            cout << "Problem opening table file for writing." << endl;
             exit(1);
         }
 
-        tablefile << "\\hline" << std::endl;
-        tablefile << "search\t&\tlb\t&\tub\t&\t\\#primal\t&\t\\#opt\t&\t\\#lowest\t&\toutput\t&\tgap (\\%)\t&\tT (s)\t&\tT$_\\text{p}$ (s)\\\\" << std::endl;
-        tablefile << "\\hline" << std::endl;
+        tablefile << "\\hline" << endl;
+        tablefile << "search\t&\tlb\t&\tub\t&\t\\#primal\t&\t\\#opt\t&\t\\#lowest\t&\toutput\t&\tgap (\\%)\t&\tT (s)\t&\tT$_\\text{p}$ (s)\\\\" << endl;
+        tablefile << "\\hline" << endl;
         
-        tablefile << std::fixed;
-        tablefile << std::setprecision(2);
+        tablefile << fixed;
+        tablefile << setprecision(2);
 
         for(int i = 0; i < 16; i++)
         {
@@ -596,8 +647,8 @@ int main()
                 {
                     if(versions[i][0] == 'f')
                     {
-                        tablefile << "\\hline" << std::endl;
-                        tablefile << std::string("\\multicolumn{3}{c|}{F") + versions[i][k + 1] + "}\t&\t";
+                        tablefile << "\\hline" << endl;
+                        tablefile << string("\\multicolumn{3}{c|}{F") + versions[i][k + 1] + "}\t&\t";
                     }
                     else if(versions[i][0] == 'h')
                     {
@@ -652,7 +703,7 @@ int main()
             }
 
             int noOfLowestGaps = 0;
-            for(int l = 0; l < noOfInstances; l++)
+            for(int l = 0; l < numOfInstances; l++)
             {
                 if(gaps[i][j][l] == lowestGap[j][l])
                 {
@@ -686,32 +737,32 @@ int main()
             }
 
             // gap
-            tablefile << gapSum[i][j]/noOfInstances << "\t&\t";
+            tablefile << gapSum[i][j]/numOfInstances << "\t&\t";
 
             // time (solved)
-            tablefile << timeSum[i][j]/noOfInstances << "\t&\t";
+            tablefile << timeSum[i][j]/numOfInstances << "\t&\t";
 
             // time (optimal)
-            tablefile << timeOptSum[i][j]/numOfOptimals[i][j] << "\\\\" << std::endl;
+            tablefile << timeOptSum[i][j]/numOfOptimals[i][j] << "\\\\" << endl;
         }
 
-        tablefile << "\\hline" << std::endl;
+        tablefile << "\\hline" << endl;
 
         tablefile.close();
     }
 
     // csv tables
     for(int j = 0; j < 4; j++) {
-        std::ofstream tablefile;
+        ofstream tablefile;
         tablefile.open("tables/obj-time-" + instancesSets[j]);
 
         if(!tablefile.is_open())
         {
-            std::cout << "Problem opening table file for writing." << std::endl;
+            cout << "Problem opening table file for writing." << endl;
             exit(1);
         }
 
-        for(int l = 0; l < noOfInstances; l++)
+        for(int l = 0; l < numOfInstances; l++)
         {
             tablefile << instancesNames[l].first << "\t";
             for(int i = 0; i < 14; i++)
@@ -720,7 +771,7 @@ int main()
             }
             tablefile << dualF1[j][l].first << "\t" << matrixObjTime[14][j][1][l].first << "\t";
             tablefile << dualF2[j][l].first << "\t" << matrixObjTime[14][j][1][l].first << "\t";
-            tablefile << primal[j][l] << "\t" << dual[j][l].first << std::endl;
+            tablefile << primal[j][l] << "\t" << dual[j][l].first << endl;
         }
     }
 
