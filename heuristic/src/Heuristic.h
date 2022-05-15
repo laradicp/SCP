@@ -6,6 +6,13 @@
 #include <chrono>
 #include <list>
 
+struct FeasiblePairsAnalysis {
+    int counter = 0;
+    std::pair<double, double> biggestFrac = std::make_pair(0, 0);
+    std::pair<double, double> smallestFrac = std::make_pair(MAXFLOAT, MAXFLOAT);
+    std::pair<double, double> fracSum = std::make_pair(0, 0);
+};
+
 bool isInfeasible(std::vector<int> &s, Data &data);
 void construction(std::vector<int> &s, Data &data);
 void insertion(std::vector<int> &s, Data &data);
@@ -19,6 +26,6 @@ void swapCL(std::vector<int> &s, Data &data, int beginSearch1, int endSearch1, i
     std::list<std::pair<int, int>> &feasiblePairs, int &feasiblePairsSize);
 void swap(std::vector<int> &s, int p1, int p2);
 void perturbation(std::vector<int> &s, Data &data);
-int heuristic(Data data, std::vector<int> &bestS);
+int heuristic(Data data, std::vector<int> &bestS, FeasiblePairsAnalysis &feasiblePairsAnalysis);
 
 #endif

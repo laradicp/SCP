@@ -738,7 +738,7 @@ void swap(vector<int> &s, int p1, int p2)
     return;
 }
 
-void perturbation(vector<int> &s, Data &data)
+void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePairsAnalysis)
 {
     int t = rand()%2, sSize = s.size();
     int n = sSize/2 < data.getDimension()/25 ? sSize/2 : data.getDimension()/25;
@@ -787,6 +787,22 @@ void perturbation(vector<int> &s, Data &data)
         int feasiblePairsSize = 0;
         swapCL(s, data, 0, sSize, feasiblePairs, feasiblePairsSize);
 
+        feasiblePairsAnalysis.counter++;
+
+        if(feasiblePairsSize/(float)sSize > feasiblePairsAnalysis.biggestFrac.first)
+        {
+            feasiblePairsAnalysis.biggestFrac.first = feasiblePairsSize/(float)sSize;
+            feasiblePairsAnalysis.biggestFrac.second = feasiblePairsSize/(float)(sSize*sSize);
+        }
+        else if(feasiblePairsSize/(float)sSize < feasiblePairsAnalysis.smallestFrac.first)
+        {
+            feasiblePairsAnalysis.smallestFrac.first = feasiblePairsSize/(float)sSize;
+            feasiblePairsAnalysis.smallestFrac.second = feasiblePairsSize/(float)(sSize*sSize);
+        }
+
+        feasiblePairsAnalysis.fracSum.first += feasiblePairsSize/(float)sSize;
+        feasiblePairsAnalysis.fracSum.second += feasiblePairsSize/(float)(sSize*sSize);
+
         if(feasiblePairsSize > 0)
         {
             int i = rand()%feasiblePairsSize;
@@ -831,7 +847,7 @@ void perturbation(vector<int> &s, Data &data)
     return;
 }
 
-int heuristic(Data data, vector<int> &bestS)
+int heuristic(Data data, vector<int> &bestS, FeasiblePairsAnalysis &feasiblePairsAnalysis)
 {
     auto beginTime = chrono::system_clock::now();
 
@@ -861,7 +877,7 @@ int heuristic(Data data, vector<int> &bestS)
                 break;
             }
             
-            perturbation(s, data);
+            perturbation(s, data, feasiblePairsAnalysis);
             
             if(s.size() == data.getDimension())
             {
