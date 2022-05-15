@@ -9,7 +9,7 @@
 struct FeasiblePairsAnalysis {
     int counter = 0;
     std::pair<double, double> biggestFrac = std::make_pair(0, 0);
-    std::pair<double, double> smallestFrac = std::make_pair(MAXFLOAT, MAXFLOAT);
+    std::pair<double, double> smallestFrac = std::make_pair(__INT_MAX__, __INT_MAX__);
     std::pair<double, double> fracSum = std::make_pair(0, 0);
 };
 
