@@ -298,25 +298,29 @@ void insertion(vector<int> &s, Data &data)
 }
 
 // for removal, beginSearch > 0 and endSearch < sSize, because there is never a search in these positions
-void removalCL(vector<int> &s, Data &data, int beginSearch, int endSearch, vector<int> &feasiblePositions)
+void removalCL(vector<int> &s, Data &data, int beginSearch, int endSearch, list<int> &feasiblePositions, int &feasiblePositionsSize)
 {
-    int feasiblePositionsSize = feasiblePositions.size(), sSize = s.size();
+    int sSize = s.size();
 
     // remove candidates that are in the range between beginSearch and endSearch, which will be updated later
-    for(int i = 1; i < feasiblePositionsSize; i++)
+    for(auto iter = feasiblePositions.begin(); iter != feasiblePositions.end();)
     {
-        if(feasiblePositions[i] <= endSearch)
+        if(*iter <= endSearch)
         {
-            if(feasiblePositions[i] >= beginSearch)
+            if(*iter >= beginSearch)
             {
-                feasiblePositions.erase(feasiblePositions.begin() + i);
-                i--;
+                feasiblePositions.erase(iter++);
                 feasiblePositionsSize--;
+            }
+            else
+            {
+                iter++;
             }
         }
         else
         {
-            feasiblePositions[i]--;
+            (*iter)--;
+            iter++;
         }
     }
 
@@ -325,6 +329,7 @@ void removalCL(vector<int> &s, Data &data, int beginSearch, int endSearch, vecto
     {
         feasiblePositions.push_back(0);
         feasiblePositions.push_back(sSize - 1);
+        feasiblePositionsSize += 2;
     }
 
     for(int p = beginSearch; p < endSearch; p++)
@@ -403,6 +408,7 @@ void removalCL(vector<int> &s, Data &data, int beginSearch, int endSearch, vecto
         if(feasiblePosition)
         {
             feasiblePositions.push_back(p);
+            feasiblePositionsSize++;
         }
     }
 
@@ -744,23 +750,34 @@ void perturbation(vector<int> &s, Data &data)
 
     if(t == 0) // removal
     {
-        vector<int> feasiblePositions;
-        removalCL(s, data, 1, sSize - 1, feasiblePositions);
+        list<int> feasiblePositions;
+        int feasiblePositionsSize = 0;
+        removalCL(s, data, 1, sSize - 1, feasiblePositions, feasiblePositionsSize);
 
-        int i = rand()%feasiblePositions.size();
-        removal(s, data, feasiblePositions[i]);
+        int i = rand()%feasiblePositionsSize;
+        auto iter = feasiblePositions.begin();
+        while(i-- > 0)
+        {
+            iter++;
+        }
+        removal(s, data, *iter);
         sSize--;
 
         for(int j = 1; j < n; j++)
         {
             // update candidate list
-            int beginSearch = feasiblePositions[i] - data.getMaxCadence() > 1 ? feasiblePositions[i] - data.getMaxCadence() : 1;
-            int endSearch = feasiblePositions[i] + data.getMaxCadence() < sSize - 1 ?
-                feasiblePositions[i] + data.getMaxCadence() : sSize - 1;
-            removalCL(s, data, beginSearch, endSearch, feasiblePositions);
+            int beginSearch = *iter - data.getMaxCadence() > 1 ? *iter - data.getMaxCadence() : 1;
+            int endSearch = *iter + data.getMaxCadence() < sSize - 1 ?
+                *iter + data.getMaxCadence() : sSize - 1;
+            removalCL(s, data, beginSearch, endSearch, feasiblePositions, feasiblePositionsSize);
 
-            i = rand()%feasiblePositions.size();
-            removal(s, data, feasiblePositions[i]);
+            i = rand()%feasiblePositionsSize;
+            iter = feasiblePositions.begin();
+            while(i-- > 0)
+            {
+                iter++;
+            }
+            removal(s, data, *iter);
             sSize--;
         }
     }
@@ -774,7 +791,8 @@ void perturbation(vector<int> &s, Data &data)
         {
             int i = rand()%feasiblePairsSize;
             auto iter = feasiblePairs.begin();
-            while(i-- > 0) {
+            while(i-- > 0)
+            {
                 iter++;
             }
             swap(s, (*iter).first, (*iter).second);
@@ -796,7 +814,8 @@ void perturbation(vector<int> &s, Data &data)
                 {
                     int i = rand()%feasiblePairsSize;
                     iter = feasiblePairs.begin();
-                    while(i-- > 0) {
+                    while(i-- > 0)
+                    {
                         iter++;
                     }
                     swap(s, (*iter).first, (*iter).second);

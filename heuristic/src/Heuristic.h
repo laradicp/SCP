@@ -9,7 +9,8 @@
 bool isInfeasible(std::vector<int> &s, Data &data);
 void construction(std::vector<int> &s, Data &data);
 void insertion(std::vector<int> &s, Data &data);
-void removalCL(std::vector<int> &s, Data &data, int beginSearch, int endSearch, std::vector<int> &feasiblePositions);
+void removalCL(std::vector<int> &s, Data &data, int beginSearch, int endSearch, std::list<int> &feasiblePositions,
+    int &feasiblePositionsSize);
 void removal(std::vector<int> &s, Data &data, int p);
 bool swapFeasibility(std::vector<int> &s, Data &data, int p1, int p2);
 void swapCL(std::vector<int> &s, Data &data, int beginSearch, int endSearch, std::list<std::pair<int, int>> &feasiblePairs,
