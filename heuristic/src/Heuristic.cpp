@@ -416,16 +416,6 @@ void removal(vector<int> &s, Data &data, int p)
     return;
 }
 
-bool comparePair(pair<int, int> p1, pair<int, int> p2)
-{
-    if(p1.first > p2.first || p1.second > p2.second)
-    {
-        return false;
-    }
-    
-    return true;
-}
-
 bool swapFeasibility(vector<int> &s, Data &data, int p1, int p2)
 {
     int sSize = s.size();
@@ -605,33 +595,30 @@ bool swapFeasibility(vector<int> &s, Data &data, int p1, int p2)
     return feasiblePair;
 }
 
-void swapCL(vector<int> &s, Data &data, int beginSearch, int endSearch, vector<pair<int, int>> &feasiblePairs)
+void swapCL(vector<int> &s, Data &data, int beginSearch, int endSearch, list<pair<int, int>> &feasiblePairs,
+    int &feasiblePairsSize)
 {
-    swapCL(s, data, beginSearch, endSearch, 0, 0, feasiblePairs);
+    swapCL(s, data, beginSearch, endSearch, 0, 0, feasiblePairs, feasiblePairsSize);
     return;
 }
 
 void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int beginSearch2, int endSearch2,
-    vector<pair<int, int>> &feasiblePairs)
+    list<pair<int, int>> &feasiblePairs, int &feasiblePairsSize)
 {
     // remove pairs that have any element in the range between beginSearch1/2 and endSearch1/2, which will be updated later
-    int feasiblePairsSize = feasiblePairs.size();
     int sSize = s.size();
-    
     if(endSearch1 >= beginSearch2)
     {
-        for(int i = 0; i < feasiblePairsSize; i++)
+        for(auto iter = feasiblePairs.begin(); iter != feasiblePairs.end();)
         {
-            if((feasiblePairs[i].first >= beginSearch1)&&(feasiblePairs[i].first < endSearch2) ||
-               (feasiblePairs[i].second >= beginSearch1)&&(feasiblePairs[i].second < endSearch2))
+            if(((*iter).first >= beginSearch1)&&((*iter).first < endSearch2) ||
+               ((*iter).second >= beginSearch1)&&((*iter).second < endSearch2))
             {
-                feasiblePairs.erase(feasiblePairs.begin() + i);
-                i--;
+                feasiblePairs.erase(iter++);
                 feasiblePairsSize--;
             }
-            else if(feasiblePairs[i].first >= endSearch2)
-            {
-                break;
+            else {
+                iter++;
             }
         }
 
@@ -642,6 +629,7 @@ void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int be
                 if(swapFeasibility(s, data, p1, p2))
                 {
                     feasiblePairs.push_back(make_pair(p1, p2));
+                    feasiblePairsSize++;
                 }
             }
         }
@@ -653,26 +641,25 @@ void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int be
                 if(swapFeasibility(s, data, p1, p2))
                 {
                     feasiblePairs.push_back(make_pair(p1, p2));
+                    feasiblePairsSize++;
                 }
             }
         }
     }
     else
     {
-        for(int i = 0; i < feasiblePairsSize; i++)
+        for(auto iter = feasiblePairs.begin(); iter != feasiblePairs.end();)
         {
-            if((feasiblePairs[i].first >= beginSearch1)&&(feasiblePairs[i].first < endSearch1) ||
-               (feasiblePairs[i].second >= beginSearch1)&&(feasiblePairs[i].second < endSearch1) ||
-               (feasiblePairs[i].first >= beginSearch2)&&(feasiblePairs[i].first < endSearch2) ||
-               (feasiblePairs[i].second >= beginSearch2)&&(feasiblePairs[i].second < endSearch2))
+            if(((*iter).first >= beginSearch1)&&((*iter).first < endSearch1) ||
+               ((*iter).second >= beginSearch1)&&((*iter).second < endSearch1) ||
+               ((*iter).first >= beginSearch2)&&((*iter).first < endSearch2) ||
+               ((*iter).second >= beginSearch2)&&((*iter).second < endSearch2))
             {
-                feasiblePairs.erase(feasiblePairs.begin() + i);
-                i--;
+                feasiblePairs.erase(iter++);
                 feasiblePairsSize--;
             }
-            else if(feasiblePairs[i].first >= endSearch2)
-            {
-                break;
+            else {
+                iter++;
             }
         }
 
@@ -683,6 +670,7 @@ void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int be
                 if(swapFeasibility(s, data, p1, p2))
                 {
                     feasiblePairs.push_back(make_pair(p1, p2));
+                    feasiblePairsSize++;
                 }
             }
             for(int p2 = beginSearch2; p2 < endSearch2; p2++)
@@ -690,6 +678,7 @@ void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int be
                 if(swapFeasibility(s, data, p1, p2))
                 {
                     feasiblePairs.push_back(make_pair(p1, p2));
+                    feasiblePairsSize++;
                 }
             }
         }
@@ -701,6 +690,7 @@ void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int be
                 if(swapFeasibility(s, data, p1, p2))
                 {
                     feasiblePairs.push_back(make_pair(p1, p2));
+                    feasiblePairsSize++;
                 }
             }
         }
@@ -712,6 +702,7 @@ void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int be
                 if(swapFeasibility(s, data, p1, p2))
                 {
                     feasiblePairs.push_back(make_pair(p1, p2));
+                    feasiblePairsSize++;
                 }
             }
         }
@@ -723,12 +714,11 @@ void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int be
                 if(swapFeasibility(s, data, p1, p2))
                 {
                     feasiblePairs.push_back(make_pair(p1, p2));
+                    feasiblePairsSize++;
                 }
             }
         }
     }
-
-    sort(feasiblePairs.begin(), feasiblePairs.end(), comparePair);
 
     return;
 }
@@ -776,31 +766,40 @@ void perturbation(vector<int> &s, Data &data)
     }
     else // swap
     {
-        vector<pair<int, int>> feasiblePairs;
-        swapCL(s, data, 0, sSize, feasiblePairs);
+        list<pair<int, int>> feasiblePairs;
+        int feasiblePairsSize = 0;
+        swapCL(s, data, 0, sSize, feasiblePairs, feasiblePairsSize);
 
-        if(!feasiblePairs.empty())
+        if(feasiblePairsSize > 0)
         {
-            int i = rand()%feasiblePairs.size();
-            swap(s, feasiblePairs[i].first, feasiblePairs[i].second);
+            int i = rand()%feasiblePairsSize;
+            auto iter = feasiblePairs.begin();
+            while(i-- > 0) {
+                iter++;
+            }
+            swap(s, (*iter).first, (*iter).second);
 
             for(int j = 1; j < n; j++)
             {
-                int beginSearch1 = feasiblePairs[i].first - data.getMaxCadence() > 0 ?
-                    feasiblePairs[i].first - data.getMaxCadence() : 0;
-                int endSearch1 = feasiblePairs[i].first + data.getMaxCadence() + 1 < sSize ?
-                    feasiblePairs[i].first + data.getMaxCadence() + 1 : sSize;
-                int beginSearch2 = feasiblePairs[i].second - data.getMaxCadence() > 0 ?
-                    feasiblePairs[i].second - data.getMaxCadence() : 0;
-                int endSearch2 = feasiblePairs[i].second + data.getMaxCadence() + 1 < sSize ?
-                    feasiblePairs[i].second + data.getMaxCadence() + 1 : sSize;
+                int beginSearch1 = (*iter).first - data.getMaxCadence() > 0 ?
+                    (*iter).first - data.getMaxCadence() : 0;
+                int endSearch1 = (*iter).first + data.getMaxCadence() + 1 < sSize ?
+                    (*iter).first + data.getMaxCadence() + 1 : sSize;
+                int beginSearch2 = (*iter).second - data.getMaxCadence() > 0 ?
+                    (*iter).second - data.getMaxCadence() : 0;
+                int endSearch2 = (*iter).second + data.getMaxCadence() + 1 < sSize ?
+                    (*iter).second + data.getMaxCadence() + 1 : sSize;
 
-                swapCL(s, data, beginSearch1, endSearch1, beginSearch2, endSearch2, feasiblePairs);
+                swapCL(s, data, beginSearch1, endSearch1, beginSearch2, endSearch2, feasiblePairs, feasiblePairsSize);
 
-                if(!feasiblePairs.empty())
+                if(feasiblePairsSize > 0)
                 {
-                    int i = rand()%feasiblePairs.size();
-                    swap(s, feasiblePairs[i].first, feasiblePairs[i].second);
+                    int i = rand()%feasiblePairsSize;
+                    iter = feasiblePairs.begin();
+                    while(i-- > 0) {
+                        iter++;
+                    }
+                    swap(s, (*iter).first, (*iter).second);
                 }
                 else
                 {
