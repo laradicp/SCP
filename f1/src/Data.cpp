@@ -177,7 +177,7 @@ int Data::getUpperBound()
         }
 
         surplus[c1] = jobsPerCadence[c1] - std::ceil(cadences[c1].first*getDimension()/
-                      (float)(cadences[c1].first + cadences[c1].second));
+                      (double)(cadences[c1].first + cadences[c1].second));
         surplus[c1] = surplus[c1] > 0 ? surplus[c1] : 0;
 
         for(int c2 = 0; c2 < c1; c2++)

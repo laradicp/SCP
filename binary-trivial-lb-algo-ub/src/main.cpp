@@ -511,7 +511,7 @@ int main(int argc, char** argv)
     std::cout << "start binary search" << std::endl;
     while(lb != ub)
     {
-        int positions = std::ceil((float)(lb + ub)/2);
+        int positions = std::ceil((double)(lb + ub)/2);
 
         std::cout << "\tpositions: " << positions << std::endl;
         if(solve(data, positions, s, time))

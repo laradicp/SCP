@@ -604,7 +604,7 @@ bool swapFeasibility(vector<int> &s, Data &data, int p1, int p2)
 void swapCL(vector<int> &s, Data &data, int beginSearch, int endSearch, list<pair<int, int>> &feasiblePairs,
     int &feasiblePairsSize)
 {
-    swapCL(s, data, beginSearch, endSearch, 0, 0, feasiblePairs, feasiblePairsSize);
+    swapCL(s, data, beginSearch, endSearch, 0, endSearch, feasiblePairs, feasiblePairsSize);
     return;
 }
 
@@ -787,24 +787,24 @@ void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePai
         int feasiblePairsSize = 0;
         swapCL(s, data, 0, sSize, feasiblePairs, feasiblePairsSize);
 
-        feasiblePairsAnalysis.counter++;
-
-        if(feasiblePairsSize/(float)sSize > feasiblePairsAnalysis.biggestFrac.first)
-        {
-            feasiblePairsAnalysis.biggestFrac.first = feasiblePairsSize/(float)sSize;
-            feasiblePairsAnalysis.biggestFrac.second = feasiblePairsSize/(float)(sSize*sSize);
-        }
-        else if(feasiblePairsSize/(float)sSize < feasiblePairsAnalysis.smallestFrac.first)
-        {
-            feasiblePairsAnalysis.smallestFrac.first = feasiblePairsSize/(float)sSize;
-            feasiblePairsAnalysis.smallestFrac.second = feasiblePairsSize/(float)(sSize*sSize);
-        }
-
-        feasiblePairsAnalysis.fracSum.first += feasiblePairsSize/(float)sSize;
-        feasiblePairsAnalysis.fracSum.second += feasiblePairsSize/(float)(sSize*sSize);
-
         if(feasiblePairsSize > 0)
         {
+            feasiblePairsAnalysis.counter++;
+
+            if(feasiblePairsSize/(double)sSize > feasiblePairsAnalysis.biggestFrac.first)
+            {
+                feasiblePairsAnalysis.biggestFrac.first = feasiblePairsSize/(double)sSize;
+                feasiblePairsAnalysis.biggestFrac.second = feasiblePairsSize/(double)(sSize*sSize);
+            }
+            else if(feasiblePairsSize/(double)sSize < feasiblePairsAnalysis.smallestFrac.first)
+            {
+                feasiblePairsAnalysis.smallestFrac.first = feasiblePairsSize/(double)sSize;
+                feasiblePairsAnalysis.smallestFrac.second = feasiblePairsSize/(double)(sSize*sSize);
+            }
+
+            feasiblePairsAnalysis.fracSum.first += feasiblePairsSize/(double)sSize;
+            feasiblePairsAnalysis.fracSum.second += feasiblePairsSize/(double)(sSize*sSize);
+
             int i = rand()%feasiblePairsSize;
             auto iter = feasiblePairs.begin();
             while(i-- > 0)
@@ -828,6 +828,22 @@ void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePai
 
                 if(feasiblePairsSize > 0)
                 {
+                    feasiblePairsAnalysis.counter++;
+
+                    if(feasiblePairsSize/(double)sSize > feasiblePairsAnalysis.biggestFrac.first)
+                    {
+                        feasiblePairsAnalysis.biggestFrac.first = feasiblePairsSize/(double)sSize;
+                        feasiblePairsAnalysis.biggestFrac.second = feasiblePairsSize/(double)(sSize*sSize);
+                    }
+                    else if(feasiblePairsSize/(double)sSize < feasiblePairsAnalysis.smallestFrac.first)
+                    {
+                        feasiblePairsAnalysis.smallestFrac.first = feasiblePairsSize/(double)sSize;
+                        feasiblePairsAnalysis.smallestFrac.second = feasiblePairsSize/(double)(sSize*sSize);
+                    }
+
+                    feasiblePairsAnalysis.fracSum.first += feasiblePairsSize/(double)sSize;
+                    feasiblePairsAnalysis.fracSum.second += feasiblePairsSize/(double)(sSize*sSize);
+
                     int i = rand()%feasiblePairsSize;
                     iter = feasiblePairs.begin();
                     while(i-- > 0)

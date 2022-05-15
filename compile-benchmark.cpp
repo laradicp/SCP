@@ -467,7 +467,7 @@ int main()
         timefile.close();
     }
 
-    cout << "average size: " << sumSize/(float)numOfInstances << endl;
+    cout << "average size: " << sumSize/(double)numOfInstances << endl;
     cout << "median: " << median << endl;
 
     // optimals and best primal solutions files
