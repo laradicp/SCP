@@ -424,6 +424,10 @@ void removal(vector<int> &s, Data &data, int p)
 
 bool swapFeasibility(vector<int> &s, Data &data, int p1, int p2)
 {
+    if(s[p1] == s[p2]) {
+        return false;
+    }
+    
     int sSize = s.size();
     bool feasiblePair = true;
 
