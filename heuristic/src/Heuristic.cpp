@@ -45,6 +45,7 @@ bool isInfeasible(vector<int> &s, Data &data)
 
 void construction(vector<int> &s, Data &data)
 {
+    cout << "construction" << endl;
     vector<int> feasibleFamilies;
 
     for(int f = 0; f < data.getFamiliesSize(); f++)
@@ -56,9 +57,21 @@ void construction(vector<int> &s, Data &data)
 
     while(feasibleFamilies.size())
     {
+        cout << "feasible families: ";
+        for(int i = 0; i < feasibleFamilies.size(); i++) {
+            cout << feasibleFamilies[i] << " ";
+        }
+        cout << endl;
+        
         int alfa = rand()%feasibleFamilies.size();
+        cout << "selected family: " << feasibleFamilies[alfa] << endl;
 
         s.push_back(feasibleFamilies[alfa]);
+        cout << "s: ";
+        for(int i = 0; i < s.size(); i++) {
+            cout << s[i] << " ";
+        }
+        cout << endl;
         data.setFamilySize(feasibleFamilies[alfa], data.getFamilySize(feasibleFamilies[alfa]) - 1);
         sSize++;
 
@@ -127,8 +140,16 @@ void construction(vector<int> &s, Data &data)
 
 void insertion(vector<int> &s, Data &data)
 {
+    cout << "insertion" << endl;
     int sSize = s.size();
     int begin = rand()%sSize;
+    cout << "begin: " << begin << endl;
+
+    cout << "s: ";
+    for(int i = 0; i < sSize; i++) {
+        cout << s[i] << " ";
+    }
+    cout << endl;
 
     for(int p = begin; p < sSize; p++)
     {
@@ -203,8 +224,14 @@ void insertion(vector<int> &s, Data &data)
 
                 if(feasibleFamily)
                 {
+                    cout << "insert family " << f << " in position " << p << ": ";
                     s.insert(s.begin() + p, f);
                     sSize++;
+
+                    for(int i = 0; i < sSize; i++) {
+                        cout << s[i] << " ";
+                    }
+                    cout << endl;
 
                     data.setFamilySize(f, data.getFamilySize(f) - 1);
                 }
@@ -285,8 +312,14 @@ void insertion(vector<int> &s, Data &data)
 
                 if(feasibleFamily)
                 {
+                    cout << "insert family " << f << " in position " << p << ": ";
                     s.insert(s.begin() + p, f);
                     sSize++;
+
+                    for(int i = 0; i < sSize; i++) {
+                        cout << s[i] << " ";
+                    }
+                    cout << endl;
 
                     data.setFamilySize(f, data.getFamilySize(f) - 1);
                 }
@@ -424,6 +457,10 @@ void removal(vector<int> &s, Data &data, int p)
 
 bool swapFeasibility(vector<int> &s, Data &data, int p1, int p2)
 {
+    if(s[p1] == s[p2]) {
+        return false;
+    }
+
     int sSize = s.size();
     bool feasiblePair = true;
 
@@ -740,6 +777,7 @@ void swap(vector<int> &s, int p1, int p2)
 
 void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePairsAnalysis)
 {
+    cout << "perturbation" << endl;
     int t = rand()%2, sSize = s.size();
     int n = sSize/2 < data.getDimension()/25 ? sSize/2 : data.getDimension()/25;
 
@@ -748,11 +786,24 @@ void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePai
         return;
     }
 
+    cout << "s: ";
+    for(int i = 0; i < sSize; i++) {
+        cout << s[i] << " ";
+    }
+    cout << endl;
+
     if(t == 0) // removal
     {
+        cout << "removal" << endl;
         list<int> feasiblePositions;
         int feasiblePositionsSize = 0;
         removalCL(s, data, 1, sSize - 1, feasiblePositions, feasiblePositionsSize);
+
+        cout << "CPos: ";
+        for(auto iter = feasiblePositions.begin(); iter != feasiblePositions.end(); iter++) {
+            cout << *iter << " ";
+        }
+        cout << endl;
 
         int i = rand()%feasiblePositionsSize;
         auto iter = feasiblePositions.begin();
@@ -760,8 +811,17 @@ void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePai
         {
             iter++;
         }
+        cout << "remove job from position " << *iter << ": " << endl;
         removal(s, data, *iter);
         sSize--;
+
+        for(int i = 0; i < sSize; i++) {
+            if(i == *iter) {
+                cout << "_ ";
+            }
+            cout << s[i] << " ";
+        }
+        cout << endl;
 
         for(int j = 1; j < n; j++)
         {
@@ -771,21 +831,43 @@ void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePai
                 *iter + data.getMaxCadence() : sSize - 1;
             removalCL(s, data, beginSearch, endSearch, feasiblePositions, feasiblePositionsSize);
 
+            cout << "CPos: ";
+            for(auto iter = feasiblePositions.begin(); iter != feasiblePositions.end(); iter++) {
+                cout << *iter << " ";
+            }
+            cout << endl;
+            
             i = rand()%feasiblePositionsSize;
             iter = feasiblePositions.begin();
             while(i-- > 0)
             {
                 iter++;
             }
+            cout << "remove job from position " << *iter << ": " << endl;
             removal(s, data, *iter);
             sSize--;
+
+            for(int i = 0; i < sSize; i++) {
+                if(i == *iter) {
+                    cout << "_ ";
+                }
+                cout << s[i] << " ";
+            }
+            cout << endl;
         }
     }
     else // swap
     {
+        cout << "swap" << endl;
         list<pair<int, int>> feasiblePairs;
         int feasiblePairsSize = 0;
         swapCL(s, data, 0, sSize, feasiblePairs, feasiblePairsSize);
+
+        cout << "CPairs: ";
+        for(auto iter = feasiblePairs.begin(); iter != feasiblePairs.end(); iter++) {
+            cout << (*iter).first << "," << (*iter).second << " ";
+        }
+        cout << endl;
 
         if(feasiblePairsSize > 0)
         {
@@ -811,7 +893,16 @@ void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePai
             {
                 iter++;
             }
+            cout << "swap jobs in positions " << (*iter).first << " and " << (*iter).second << ": " << endl;
             swap(s, (*iter).first, (*iter).second);
+
+            for(int i = 0; i < sSize; i++) {
+                if(i == (*iter).first || i == (*iter).second) {
+                    cout << "->";
+                }
+                cout << s[i] << " ";
+            }
+            cout << endl;
 
             for(int j = 1; j < n; j++)
             {
@@ -825,6 +916,12 @@ void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePai
                     (*iter).second + data.getMaxCadence() + 1 : sSize;
 
                 swapCL(s, data, beginSearch1, endSearch1, beginSearch2, endSearch2, feasiblePairs, feasiblePairsSize);
+
+                cout << "CPairs: ";
+                for(auto iter = feasiblePairs.begin(); iter != feasiblePairs.end(); iter++) {
+                    cout << (*iter).first << "," << (*iter).second << " ";
+                }
+                cout << endl;
 
                 if(feasiblePairsSize > 0)
                 {
@@ -850,7 +947,16 @@ void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePai
                     {
                         iter++;
                     }
+                    cout << "swap jobs in positions " << (*iter).first << " and " << (*iter).second << ": " << endl;
                     swap(s, (*iter).first, (*iter).second);
+
+                    for(int i = 0; i < sSize; i++) {
+                        if(i == (*iter).first || i == (*iter).second) {
+                            cout << "->";
+                        }
+                        cout << s[i] << " ";
+                    }
+                    cout << endl;
                 }
                 else
                 {
