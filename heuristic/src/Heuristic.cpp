@@ -616,10 +616,10 @@ void swapCL(vector<int> &s, Data &data, int beginSearch, int endSearch, list<pai
 void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int beginSearch2, int endSearch2,
     list<pair<int, int>> &feasiblePairs, int &feasiblePairsSize)
 {
-    // remove pairs that have any element in the range between beginSearch1/2 and endSearch1/2, which will be updated later
     int sSize = s.size();
     if(endSearch1 >= beginSearch2)
     {
+        // remove pairs that have any element in the range between beginSearch1/2 and endSearch1/2, which will be updated later
         for(auto iter = feasiblePairs.begin(); iter != feasiblePairs.end();)
         {
             if(((*iter).first >= beginSearch1)&&((*iter).first < endSearch2) ||
@@ -659,6 +659,7 @@ void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int be
     }
     else
     {
+        // remove pairs that have any element in the range between beginSearch1/2 and endSearch1/2, which will be updated later
         for(auto iter = feasiblePairs.begin(); iter != feasiblePairs.end();)
         {
             if(((*iter).first >= beginSearch1)&&((*iter).first < endSearch1) ||
