@@ -429,6 +429,13 @@ bool swapFeasibility(vector<int> &s, Data &data, int p1, int p2)
         return false;
     }
 
+    if(p1 > p2)
+    {
+        int aux = p1;
+        p1 = p2;
+        p2 = aux;
+    }
+
     int sSize = s.size();
     bool feasiblePair = true;
 
@@ -606,145 +613,15 @@ bool swapFeasibility(vector<int> &s, Data &data, int p1, int p2)
     return feasiblePair;
 }
 
-void swapCL(vector<int> &s, Data &data, int beginSearch, int endSearch, list<pair<int, int>> &feasiblePairs,
-    int &feasiblePairsSize)
-{
-    swapCL(s, data, beginSearch, endSearch, 0, endSearch, feasiblePairs, feasiblePairsSize);
-    return;
-}
-
-void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int beginSearch2, int endSearch2,
-    list<pair<int, int>> &feasiblePairs, int &feasiblePairsSize)
-{
-    int sSize = s.size();
-    if(endSearch1 >= beginSearch2)
-    {
-        // remove pairs that have any element in the range between beginSearch1/2 and endSearch1/2, which will be updated later
-        for(auto iter = feasiblePairs.begin(); iter != feasiblePairs.end();)
-        {
-            if(((*iter).first >= beginSearch1)&&((*iter).first < endSearch2) ||
-               ((*iter).second >= beginSearch1)&&((*iter).second < endSearch2))
-            {
-                feasiblePairs.erase(iter++);
-                feasiblePairsSize--;
-            }
-            else {
-                iter++;
-            }
-        }
-
-        for(int p1 = 0; p1 < beginSearch1; p1++)
-        {
-            for(int p2 = beginSearch1; p2 < endSearch2; p2++)
-            {
-                if(swapFeasibility(s, data, p1, p2))
-                {
-                    feasiblePairs.push_back(make_pair(p1, p2));
-                    feasiblePairsSize++;
-                }
-            }
-        }
-
-        for(int p1 = beginSearch1; p1 < endSearch2; p1++)
-        {
-            for(int p2 = p1 + 1; p2 < sSize; p2++)
-            {
-                if(swapFeasibility(s, data, p1, p2))
-                {
-                    feasiblePairs.push_back(make_pair(p1, p2));
-                    feasiblePairsSize++;
-                }
-            }
-        }
-    }
-    else
-    {
-        // remove pairs that have any element in the range between beginSearch1/2 and endSearch1/2, which will be updated later
-        for(auto iter = feasiblePairs.begin(); iter != feasiblePairs.end();)
-        {
-            if(((*iter).first >= beginSearch1)&&((*iter).first < endSearch1) ||
-               ((*iter).second >= beginSearch1)&&((*iter).second < endSearch1) ||
-               ((*iter).first >= beginSearch2)&&((*iter).first < endSearch2) ||
-               ((*iter).second >= beginSearch2)&&((*iter).second < endSearch2))
-            {
-                feasiblePairs.erase(iter++);
-                feasiblePairsSize--;
-            }
-            else {
-                iter++;
-            }
-        }
-
-        for(int p1 = 0; p1 < beginSearch1; p1++)
-        {
-            for(int p2 = beginSearch1; p2 < endSearch1; p2++)
-            {
-                if(swapFeasibility(s, data, p1, p2))
-                {
-                    feasiblePairs.push_back(make_pair(p1, p2));
-                    feasiblePairsSize++;
-                }
-            }
-            for(int p2 = beginSearch2; p2 < endSearch2; p2++)
-            {
-                if(swapFeasibility(s, data, p1, p2))
-                {
-                    feasiblePairs.push_back(make_pair(p1, p2));
-                    feasiblePairsSize++;
-                }
-            }
-        }
-
-        for(int p1 = beginSearch1; p1 < endSearch1; p1++)
-        {
-            for(int p2 = p1 + 1; p2 < sSize; p2++)
-            {
-                if(swapFeasibility(s, data, p1, p2))
-                {
-                    feasiblePairs.push_back(make_pair(p1, p2));
-                    feasiblePairsSize++;
-                }
-            }
-        }
-
-        for(int p1 = endSearch1; p1 < beginSearch2; p1++)
-        {
-            for(int p2 = beginSearch2; p2 < endSearch2; p2++)
-            {
-                if(swapFeasibility(s, data, p1, p2))
-                {
-                    feasiblePairs.push_back(make_pair(p1, p2));
-                    feasiblePairsSize++;
-                }
-            }
-        }
-
-        for(int p1 = beginSearch2; p1 < endSearch2; p1++)
-        {
-            for(int p2 = p1 + 1; p2 < sSize; p2++)
-            {
-                if(swapFeasibility(s, data, p1, p2))
-                {
-                    feasiblePairs.push_back(make_pair(p1, p2));
-                    feasiblePairsSize++;
-                }
-            }
-        }
-    }
-
-    return;
-}
-
 void swap(vector<int> &s, int p1, int p2)
 {
-    s.insert(s.begin() + p2, s[p1]);
-    s.insert(s.begin() + p1, s[p2 + 1]);
-    s.erase(s.begin() + p1 + 1);
-    s.erase(s.begin() + p2 + 1);
+    int aux = s[p1];
+    s[p1] = s[p2];
+    s[p2] = aux;
     return;
 }
 
-void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePairsAnalysis)
+void perturbation(vector<int> &s, Data &data, vector<char> &infeasibleSwapPos)
 {
     int t = rand()%2, sSize = s.size();
     int n = sSize/2 < data.getDimension()/25 ? sSize/2 : data.getDimension()/25;
@@ -789,87 +666,72 @@ void perturbation(vector<int> &s, Data &data, FeasiblePairsAnalysis &feasiblePai
     }
     else // swap
     {
-        list<pair<int, int>> feasiblePairs;
-        int feasiblePairsSize = 0;
-        swapCL(s, data, 0, sSize, feasiblePairs, feasiblePairsSize);
-
-        if(feasiblePairsSize > 0)
+        list<int> computedPos;
+        for(int j = 0; j < n; j++)
         {
-            feasiblePairsAnalysis.counter++;
-
-            if(feasiblePairsSize/(double)sSize > feasiblePairsAnalysis.biggestFrac.first)
+            int p1 = rand()%sSize;
+            while(infeasibleSwapPos[p1] == '1') // it will find a '0' because n = min(sSize/2, data.getDimension()/25)
             {
-                feasiblePairsAnalysis.biggestFrac.first = feasiblePairsSize/(double)sSize;
-                feasiblePairsAnalysis.biggestFrac.second = feasiblePairsSize/(double)(sSize*sSize);
-            }
-            else if(feasiblePairsSize/(double)sSize < feasiblePairsAnalysis.smallestFrac.first)
-            {
-                feasiblePairsAnalysis.smallestFrac.first = feasiblePairsSize/(double)sSize;
-                feasiblePairsAnalysis.smallestFrac.second = feasiblePairsSize/(double)(sSize*sSize);
-            }
-
-            feasiblePairsAnalysis.fracSum.first += feasiblePairsSize/(double)sSize;
-            feasiblePairsAnalysis.fracSum.second += feasiblePairsSize/(double)(sSize*sSize);
-
-            int i = rand()%feasiblePairsSize;
-            auto iter = feasiblePairs.begin();
-            while(i-- > 0)
-            {
-                iter++;
-            }
-            swap(s, (*iter).first, (*iter).second);
-
-            for(int j = 1; j < n; j++)
-            {
-                int beginSearch1 = (*iter).first - data.getMaxCadence() > 0 ?
-                    (*iter).first - data.getMaxCadence() : 0;
-                int endSearch1 = (*iter).first + data.getMaxCadence() + 1 < sSize ?
-                    (*iter).first + data.getMaxCadence() + 1 : sSize;
-                int beginSearch2 = (*iter).second - data.getMaxCadence() > 0 ?
-                    (*iter).second - data.getMaxCadence() : 0;
-                int endSearch2 = (*iter).second + data.getMaxCadence() + 1 < sSize ?
-                    (*iter).second + data.getMaxCadence() + 1 : sSize;
-
-                swapCL(s, data, beginSearch1, endSearch1, beginSearch2, endSearch2, feasiblePairs, feasiblePairsSize);
-
-                if(feasiblePairsSize > 0)
+                if(++p1 == sSize)
                 {
-                    feasiblePairsAnalysis.counter++;
-
-                    if(feasiblePairsSize/(double)sSize > feasiblePairsAnalysis.biggestFrac.first)
-                    {
-                        feasiblePairsAnalysis.biggestFrac.first = feasiblePairsSize/(double)sSize;
-                        feasiblePairsAnalysis.biggestFrac.second = feasiblePairsSize/(double)(sSize*sSize);
-                    }
-                    else if(feasiblePairsSize/(double)sSize < feasiblePairsAnalysis.smallestFrac.first)
-                    {
-                        feasiblePairsAnalysis.smallestFrac.first = feasiblePairsSize/(double)sSize;
-                        feasiblePairsAnalysis.smallestFrac.second = feasiblePairsSize/(double)(sSize*sSize);
-                    }
-
-                    feasiblePairsAnalysis.fracSum.first += feasiblePairsSize/(double)sSize;
-                    feasiblePairsAnalysis.fracSum.second += feasiblePairsSize/(double)(sSize*sSize);
-
-                    int i = rand()%feasiblePairsSize;
-                    iter = feasiblePairs.begin();
-                    while(i-- > 0)
-                    {
-                        iter++;
-                    }
-                    swap(s, (*iter).first, (*iter).second);
+                    p1 = 0;
                 }
-                else
+            }
+
+            infeasibleSwapPos[p1] = '1';
+            computedPos.push_back(p1);
+            
+            int begin = rand()%sSize;
+            for(int p2 = begin; p2 < sSize; p2++)
+            {
+                if((infeasibleSwapPos[p2] == '0')&&(swapFeasibility(s, data, p1, p2)))
                 {
+                    swap(s, p1, p2);
+
+                    // clean infeasibleSwapPos
+                    for(auto iter = computedPos.begin(); iter != computedPos.end();)
+                    {
+                        infeasibleSwapPos[*iter] = '0';
+                        computedPos.erase(iter++);
+                    }
+                    
                     break;
                 }
             }
+
+            if(!computedPos.empty()) // if swap not already performed, continue search
+            {
+                for(int p2 = 0; p2 < begin; p2++)
+                {
+                    if((infeasibleSwapPos[p2] == '0')&&(swapFeasibility(s, data, p1, p2)))
+                    {
+                        swap(s, p1, p2);
+
+                        // clean infeasibleSwapPos
+                        for(auto iter = computedPos.begin(); iter != computedPos.end();)
+                        {
+                            infeasibleSwapPos[*iter] = '0';
+                            computedPos.erase(iter++);
+                        }
+                        
+                        break;
+                    }
+                }
+            }
+        }
+
+        // clean infeasibleSwapPos
+        for(auto iter = computedPos.begin(); iter != computedPos.end();)
+        {
+            infeasibleSwapPos[*iter] = '0';
+            computedPos.erase(iter++);
         }
     }
 
     return;
 }
 
-int heuristic(Data data, vector<int> &bestS, FeasiblePairsAnalysis &feasiblePairsAnalysis)
+int heuristic(Data data, vector<int> &bestS)
 {
     auto beginTime = chrono::system_clock::now();
 
@@ -878,6 +740,8 @@ int heuristic(Data data, vector<int> &bestS, FeasiblePairsAnalysis &feasiblePair
 
     Data fullData = data;
     int bestSSize = 0;
+
+    vector<char> infeasibleSwapPos(data.getDimension(), '0');
 
     for(int i = 0; i < 15; i++)
     {
@@ -899,7 +763,7 @@ int heuristic(Data data, vector<int> &bestS, FeasiblePairsAnalysis &feasiblePair
                 break;
             }
             
-            perturbation(s, data, feasiblePairsAnalysis);
+            perturbation(s, data, infeasibleSwapPos);
             
             if(s.size() == data.getDimension())
             {
