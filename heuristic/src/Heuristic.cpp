@@ -737,10 +737,9 @@ void swapCL(vector<int> &s, Data &data, int beginSearch1, int endSearch1, int be
 
 void swap(vector<int> &s, int p1, int p2)
 {
-    s.insert(s.begin() + p2, s[p1]);
-    s.insert(s.begin() + p1, s[p2 + 1]);
-    s.erase(s.begin() + p1 + 1);
-    s.erase(s.begin() + p2 + 1);
+    int aux = s[p1];
+    s[p1] = s[p2];
+    s[p2] = aux;
     return;
 }
 
