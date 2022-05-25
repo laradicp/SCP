@@ -35,10 +35,10 @@ Data::Data(std::string filePath)
             break;
         }
 
-        std::vector<std::pair<std::pair<int, int>, bool>> cadencesPerJob;
+        std::vector<std::pair<std::pair<int, int>, char>> cadencesPerJob;
         // cadencesPerJob[c].first = original cadence
         // cadencesPerJob[c].second = job has the cadence (1) or not (0)
-        bool cadencePerJob;
+        char cadencePerJob;
 
         for(int c = 0; c < cadencesSize; c++)
         {
@@ -76,7 +76,7 @@ Data::Data(std::string filePath)
 
         if(none)
         {
-            std::pair<std::vector<bool>, std::vector<int>> newFamily;
+            std::pair<std::vector<char>, std::vector<int>> newFamily;
             
             for(int c = 0; c < cadencesSize; c++)
             {
@@ -141,7 +141,7 @@ int Data::getMaxCadence()
     return maxCadence;
 }
 
-bool Data::compareCadencePairs(std::pair<std::pair<int, int>, bool> p1, std::pair<std::pair<int, int>, bool> p2)
+bool Data::compareCadencePairs(std::pair<std::pair<int, int>, char> p1, std::pair<std::pair<int, int>, char> p2)
 {
     return compareCadences(p1.first, p2.first);
 }
@@ -197,7 +197,7 @@ int Data::getFamilySize(int f)
 
 bool Data::getCadencesPerFamily(int f, int c)
 {
-    return families[f].first[c];
+    return families[f].first[c] == '1';
 }
 
 int Data::getUpperBound()

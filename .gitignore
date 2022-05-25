@@ -21,4 +21,5 @@ compile-heuristic-output
 compile-heuristic-calibration
 scp-heuristic
 *.ods
-
+CPairs-analysis*
+callgrind*
