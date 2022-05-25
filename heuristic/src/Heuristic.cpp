@@ -858,6 +858,19 @@ int heuristic(Data data, vector<int> &bestS)
             }
             
             perturbation(s, data, infeasibleSwapPos);
+
+            if(isInfeasible(s, data))
+            {
+                cout << "(ERROR) Infeasible solution: ";
+                int sSize = s.size();
+                for(int p = 0; p < sSize; p++)
+                {
+                    cout << s[p] << " ";
+                }
+                cout << endl;
+
+                exit(1);
+            }
             
             if(s.size() == data.getDimension())
             {

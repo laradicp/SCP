@@ -37,13 +37,21 @@ Data::Data(std::string filePath)
 
         std::vector<std::pair<std::pair<int, int>, char>> cadencesPerJob;
         // cadencesPerJob[c].first = original cadence
-        // cadencesPerJob[c].second = job has the cadence (1) or not (0)
-        char cadencePerJob;
+        // cadencesPerJob[c].second = job has the cadence ('1') or not ('0')
+        bool cadencePerJob;
 
         for(int c = 0; c < cadencesSize; c++)
         {
             in >> cadencePerJob;
-            cadencesPerJob.push_back(std::make_pair(cadences[c], cadencePerJob));
+
+            if(cadencePerJob)
+            {
+                cadencesPerJob.push_back(std::make_pair(cadences[c], '1'));
+            }
+            else
+            {
+                cadencesPerJob.push_back(std::make_pair(cadences[c], '0'));
+            }
         }
 
         std::sort(cadencesPerJob.begin(), cadencesPerJob.end(), compareCadencePairs);
@@ -55,7 +63,7 @@ Data::Data(std::string filePath)
             
             for(int c = 0; c < cadencesSize; c++)
             {
-                if(cadencesPerJob[c].second != getCadencesPerFamily(f, c))
+                if(cadencesPerJob[c].second != getCadencesPerFamily(f, c) + '0')
                 {
                     equal = false;
 
