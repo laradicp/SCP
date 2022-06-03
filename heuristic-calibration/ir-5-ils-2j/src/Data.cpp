@@ -35,15 +35,23 @@ Data::Data(std::string filePath)
             break;
         }
 
-        std::vector<std::pair<std::pair<int, int>, bool>> cadencesPerJob;
+        std::vector<std::pair<std::pair<int, int>, char>> cadencesPerJob;
         // cadencesPerJob[c].first = original cadence
-        // cadencesPerJob[c].second = job has the cadence (1) or not (0)
+        // cadencesPerJob[c].second = job has the cadence ('1') or not ('0')
         bool cadencePerJob;
 
         for(int c = 0; c < cadencesSize; c++)
         {
             in >> cadencePerJob;
-            cadencesPerJob.push_back(std::make_pair(cadences[c], cadencePerJob));
+
+            if(cadencePerJob)
+            {
+                cadencesPerJob.push_back(std::make_pair(cadences[c], '1'));
+            }
+            else
+            {
+                cadencesPerJob.push_back(std::make_pair(cadences[c], '0'));
+            }
         }
 
         std::sort(cadencesPerJob.begin(), cadencesPerJob.end(), compareCadencePairs);
@@ -55,7 +63,7 @@ Data::Data(std::string filePath)
             
             for(int c = 0; c < cadencesSize; c++)
             {
-                if(cadencesPerJob[c].second != getCadencesPerFamily(f, c))
+                if(cadencesPerJob[c].second != getCadencesPerFamily(f, c) + '0')
                 {
                     equal = false;
 
@@ -76,7 +84,7 @@ Data::Data(std::string filePath)
 
         if(none)
         {
-            std::pair<std::vector<bool>, std::vector<int>> newFamily;
+            std::pair<std::vector<char>, std::vector<int>> newFamily;
             
             for(int c = 0; c < cadencesSize; c++)
             {
@@ -141,7 +149,7 @@ int Data::getMaxCadence()
     return maxCadence;
 }
 
-bool Data::compareCadencePairs(std::pair<std::pair<int, int>, bool> p1, std::pair<std::pair<int, int>, bool> p2)
+bool Data::compareCadencePairs(std::pair<std::pair<int, int>, char> p1, std::pair<std::pair<int, int>, char> p2)
 {
     return compareCadences(p1.first, p2.first);
 }
@@ -197,7 +205,7 @@ int Data::getFamilySize(int f)
 
 bool Data::getCadencesPerFamily(int f, int c)
 {
-    return families[f].first[c];
+    return families[f].first[c] == '1';
 }
 
 int Data::getUpperBound()
@@ -258,12 +266,12 @@ int Data::used(int j, int i, std::vector<int> &s, std::vector<double> &score, st
     return used(j, i - 1, s, score, jobsPerScore, familiesPerScore, intersection) + min;
 }
 
-std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<double> &score, std::vector<int> &jobsPerScore,
+void Data::calculateLB(int i, std::vector<int> &s, std::vector<double> &score, std::vector<int> &jobsPerScore,
     std::vector<std::vector<int>> &familiesPerScore, std::vector<std::vector<int>> &intersection)
 {
     if(lb[i] != -1)
     {
-        return s;
+        return;
     }
 
     if(i == 0)
@@ -277,7 +285,6 @@ std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<doubl
             {
                 if(familySize[familiesPerScore[i][fIdx]] == 0)
                 {
-                    job--;
                     break;
                 }
 
@@ -293,14 +300,20 @@ std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<doubl
 
         lb[i] = jobsPerScore[i];
 
-        return s;
+        return;
     }
     
     calculateLB(i - 1, s, score, jobsPerScore, familiesPerScore, intersection);
 
     int min = ceil(lb[i - 1]/score[i]) < jobsPerScore[i] ? ceil(lb[i - 1]/score[i]) : jobsPerScore[i],
         violations = 0;
-    int usedPos;
+    int usedPos = 0;
+    if(i == 1)
+    {
+        usedPos = used(i, i, s, score, jobsPerScore, familiesPerScore, intersection);
+    }
+    
+    // j = 0 does not correspond to any cadence, therefore it is not used for violations
     for(int j = 1; j < i; j++)
     {
         usedPos = used(j, i, s, score, jobsPerScore, familiesPerScore, intersection);
@@ -308,64 +321,105 @@ std::vector<int> Data::calculateLB(int i, std::vector<int> &s, std::vector<doubl
     }
 
     int max = min - violations > 0 ? min - violations : 0; // number of jobs added to solution
-
+    
     // update primal solution
-    int familiesPerScoreSize = familiesPerScore[i].size();
-    int job = 0;
-    int insertPos = usedPos*(getCadence(i - 1) + 1); // i - 1 since first score is zero cadence
-    if(cadenceType(i - 1) == 2)
+    int sSize = s.size(), familiesPerScoreSize = familiesPerScore[i].size();
+    int insertedJobs = 0;
+    for(int p = 0; p < sSize; p++)
     {
-        insertPos = floor(insertPos/double(getCadence(i - 1)));
-        for(int fIdx = 0; fIdx < familiesPerScoreSize; fIdx++)
+        if(insertedJobs == max)
         {
-            for(; job < max; job++)
-            {
-                if(familySize[familiesPerScore[i][fIdx]] == 0)
-                {
-                    job--;
-                    break;
-                }
-
-                s.insert(s.begin() + insertPos, familiesPerScore[i][fIdx]);
-                familySize[familiesPerScore[i][fIdx]]--;
-
-                insertPos = floor(++usedPos*(getCadence(i - 1) + 1)/double(getCadence(i - 1)));
-            }
-
-            if(job == max)
-            {
-                break;
-            }
+            break;
         }
-    }
-    else
-    {
+
         for(int fIdx = 0; fIdx < familiesPerScoreSize; fIdx++)
-        {
-            for(; job < max; job++)
+        {	
+            if(getFamilySize(familiesPerScore[i][fIdx]))
             {
-                if(familySize[familiesPerScore[i][fIdx]] == 0)
+                bool feasibleFamily = true;
+
+                for(int c = 0; c < i; c++) // M can have jobs with cadence up to c = i - 1
                 {
-                    job--;
-                    break;
+                    if(getCadencesPerFamily(familiesPerScore[i][fIdx], c))
+                    {
+                        int begin = p - getCadence(c) > 0 ? p - getCadence(c) : 0;
+                        int end = p + getCadence(c) < sSize ? p + getCadence(c) : sSize;
+                        
+                        if(cadenceType(c) == 1)
+                        {
+                            for(int k = begin; k < end; k++)
+                            {
+                                if(getCadencesPerFamily(s[k], c))
+                                {
+                                    feasibleFamily = false;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            int sum = 0;
+
+                            for(int k = begin; k < p; k++)
+                            {
+                                if(getCadencesPerFamily(s[k], c))
+                                {
+                                    sum++;
+                                }
+                                else
+                                {
+                                    sum = 0; 
+                                }
+                            }
+
+                            sum++;
+                            
+                            if(sum > getCadence(c))
+                            {
+                                feasibleFamily = false;
+                                break;
+                            }
+
+                            for(int k = p; k < end; k++)
+                            {
+                                if(getCadencesPerFamily(s[k], c))
+                                {
+                                    sum++;
+
+                                    if(sum > getCadence(c))
+                                    {
+                                        feasibleFamily = false;
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    sum = 0; 
+                                }
+                            }
+                        }
+                    }
                 }
 
-                s.insert(s.begin() + insertPos, familiesPerScore[i][fIdx]);
-                familySize[familiesPerScore[i][fIdx]]--;
+                if(feasibleFamily)
+                {
+                    s.insert(s.begin() + p, familiesPerScore[i][fIdx]);
+                    sSize++;
 
-                insertPos += getCadence(i - 1) + 1;
-            }
+                    setFamilySize(familiesPerScore[i][fIdx], getFamilySize(familiesPerScore[i][fIdx]) - 1);
 
-            if(job == max)
-            {
-                break;
+                    if(++insertedJobs == max)
+                    {
+                        break;
+                    }
+                }
             }
         }
     }
 
     lb[i] = lb[i - 1] + max;
 
-    return s;
+    return;
 }
 
 int Data::getLowerBound()
@@ -388,15 +442,15 @@ std::vector<int> Data::getLowerBoundSol()
     std::vector<std::vector<int>> intersection(getCadencesSize() + 1, std::vector<int>(getCadencesSize() + 1, 0));
 
     // Set scores
-    for(int c = 1; c < getCadencesSize() + 1; c++)
+    for(int i = 1; i < getCadencesSize() + 1; i++)
     {
-        if(cadenceType(c - 1) == 1)
+        if(cadenceType(i - 1) == 1)
         {
-            score[c] = getCadence(c - 1);
+            score[i] = getCadence(i - 1);
         }
         else
         {
-            score[c] = 1.0/getCadence(c - 1);
+            score[i] = 1.0/getCadence(i - 1);
         }
     }
 
@@ -404,15 +458,15 @@ std::vector<int> Data::getLowerBoundSol()
     for(int f = 0; f < getFamiliesSize(); f++)
     {
         bool noCadence = true;
-        for(int c1 = 1; c1 < getCadencesSize() + 1; c1++)
+        for(int i = 1; i < getCadencesSize() + 1; i++)
         {
-            if(getCadencesPerFamily(f, c1 - 1))
+            if(getCadencesPerFamily(f, i - 1))
             {
                 noCadence = false;
                 bool mostRestrictive = true;
-                for(int c2 = c1 + 1; c2 < getCadencesSize() + 1; c2++)
+                for(int j = i + 1; j < getCadencesSize() + 1; j++)
                 {
-                    if(getCadencesPerFamily(f, c2 - 1))
+                    if(getCadencesPerFamily(f, j - 1))
                     {
                         mostRestrictive = false;
                         break;
@@ -421,19 +475,20 @@ std::vector<int> Data::getLowerBoundSol()
                 if(mostRestrictive)
                 {
                     // Update |M|
-                    jobsPerScore[c1] += getFamilySize(f);
-                    familiesPerScore[c1].push_back(f);
+                    jobsPerScore[i] += getFamilySize(f);
+                    familiesPerScore[i].push_back(f);
                     // Update intersections
-                    for(int c2 = 1; c2 < c1; c2++)
+                    for(int j = 1; j < i; j++)
                     {
-                        if(getCadencesPerFamily(f, c2 - 1))
+                        if(getCadencesPerFamily(f, j - 1))
                         {
-                            intersection[c1][c2] += getFamilySize(f);
+                            intersection[i][j] += getFamilySize(f);
                         }
                     }
                 }
             }
         }
+
         if(noCadence)
         {
             // Update |M|
@@ -442,5 +497,9 @@ std::vector<int> Data::getLowerBoundSol()
         }
     }
     
-    return calculateLB(getCadencesSize(), s, score, jobsPerScore, familiesPerScore, intersection);
+    std::vector<int> familySizeReset = familySize;
+    calculateLB(getCadencesSize(), s, score, jobsPerScore, familiesPerScore, intersection);
+    familySize = familySizeReset;
+
+    return s;
 }

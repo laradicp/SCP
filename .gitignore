@@ -3,8 +3,6 @@
 *.lp
 
 run*
-ir-ils-table*
-perturb-table*
 number-of-families*
 
 .vscode/

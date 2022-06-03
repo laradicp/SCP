@@ -28,7 +28,7 @@ OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRCS))
 scp-heuristic: $(OBJS) 
 	@echo  "\033[31m \nLinking all objects files: \033[0m"
 	#$(CPPC) $(BITS_OPTION) $(OBJS) -g -o $@ $(CCLNFLAGS)
-	$(CPPC) $(BITS_OPTION) $(OBJS) -o $@ $(CCLNFLAGS)
+	$(CPPC) $(BITS_OPTION) $(OBJS) -g -o $@ $(CCLNFLAGS)
 ############################
 
 #inclui os arquivos de dependencias

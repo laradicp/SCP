@@ -624,7 +624,7 @@ void swap(vector<int> &s, int p1, int p2)
 void perturbation(vector<int> &s, Data &data, vector<char> &infeasibleSwapPos)
 {
     int t = rand()%2, sSize = s.size();
-    int n = sSize/2 < data.getDimension()/25 ? sSize/2 : data.getDimension()/25;
+    int n = sSize/2 < data.getDimension()/15 ? sSize/2 : data.getDimension()/15;
 
     if(n == 0)
     {
