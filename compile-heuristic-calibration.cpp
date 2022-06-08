@@ -157,12 +157,12 @@ int main()
 
     for(int set = 0; set < setsSize; set++)
     {
-        storeBenchmark("heuristic-calibration/ir5ilsj/benchmark/" + instancesSets[set], ir5ilsj);
-        storeBenchmark("heuristic-calibration/ir5ilsj2/benchmark/" + instancesSets[set], ir5ilsj2);
-        storeBenchmark("heuristic-calibration/ir10ilsj/benchmark/" + instancesSets[set], ir10ilsj);
-        storeBenchmark("heuristic-calibration/ir10ilsj2/benchmark/" + instancesSets[set], ir10ilsj2);
-        storeBenchmark("heuristic-calibration/ir15ilsj/benchmark/" + instancesSets[set], ir15ilsj);
-        storeBenchmark("heuristic-calibration/ir15ilsj2/benchmark/" + instancesSets[set], ir15ilsj2);
+        storeBenchmark("heuristic-calibration/ir-5-ils-j/benchmark/" + instancesSets[set], ir5ilsj);
+        storeBenchmark("heuristic-calibration/ir-5-ils-j_2/benchmark/" + instancesSets[set], ir5ilsj2);
+        storeBenchmark("heuristic-calibration/ir-10-ils-j/benchmark/" + instancesSets[set], ir10ilsj);
+        storeBenchmark("heuristic-calibration/ir-10-ils-j_2/benchmark/" + instancesSets[set], ir10ilsj2);
+        storeBenchmark("heuristic-calibration/ir-15-ils-j/benchmark/" + instancesSets[set], ir15ilsj);
+        storeBenchmark("heuristic-calibration/ir-15-ils-j_2/benchmark/" + instancesSets[set], ir15ilsj2);
 
         // output
         ofstream objOutput, timeOutput;
