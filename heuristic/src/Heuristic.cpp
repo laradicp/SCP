@@ -743,7 +743,7 @@ int heuristic(Data data, vector<int> &bestS)
 
     vector<char> infeasibleSwapPos(data.getDimension(), '0');
 
-    for(int i = 0; i < 15; i++)
+    for(int i = 0; i < 25; i++)
     {
         vector<int> currentBestS;
         data = fullData;
