@@ -153,16 +153,26 @@ int main()
         timeOutput.close();
     }
 
-    vector<vector<Output>> ir5ilsj, ir5ilsj2, ir10ilsj, ir10ilsj2, ir15ilsj, ir15ilsj2;
+    vector<vector<Output>> ir5ilsj2, ir5ilsj, ir5ils2j, ir10ilsj2, ir10ilsj, ir10ils2j, ir15ilsj2, ir15ilsj, ir15ils2j,
+        ir25ilsj2, ir25ilsj, ir25ils2j, ir50ilsj2, ir50ilsj, ir50ils2j;
 
     for(int set = 0; set < setsSize; set++)
     {
-        storeBenchmark("heuristic-calibration/ir-5-ils-j/benchmark/" + instancesSets[set], ir5ilsj);
         storeBenchmark("heuristic-calibration/ir-5-ils-j_2/benchmark/" + instancesSets[set], ir5ilsj2);
-        storeBenchmark("heuristic-calibration/ir-10-ils-j/benchmark/" + instancesSets[set], ir10ilsj);
+        storeBenchmark("heuristic-calibration/ir-5-ils-j/benchmark/" + instancesSets[set], ir5ilsj);
+        storeBenchmark("heuristic-calibration/ir-5-ils-2j/benchmark/" + instancesSets[set], ir5ils2j);
         storeBenchmark("heuristic-calibration/ir-10-ils-j_2/benchmark/" + instancesSets[set], ir10ilsj2);
-        storeBenchmark("heuristic-calibration/ir-15-ils-j/benchmark/" + instancesSets[set], ir15ilsj);
+        storeBenchmark("heuristic-calibration/ir-10-ils-j/benchmark/" + instancesSets[set], ir10ilsj);
+        storeBenchmark("heuristic-calibration/ir-10-ils-2j/benchmark/" + instancesSets[set], ir10ils2j);
         storeBenchmark("heuristic-calibration/ir-15-ils-j_2/benchmark/" + instancesSets[set], ir15ilsj2);
+        storeBenchmark("heuristic-calibration/ir-15-ils-j/benchmark/" + instancesSets[set], ir15ilsj);
+        storeBenchmark("heuristic-calibration/ir-15-ils-2j/benchmark/" + instancesSets[set], ir15ils2j);
+        storeBenchmark("heuristic-calibration/ir-25-ils-j_2/benchmark/" + instancesSets[set], ir25ilsj2);
+        storeBenchmark("heuristic-calibration/ir-25-ils-j/benchmark/" + instancesSets[set], ir25ilsj);
+        storeBenchmark("heuristic-calibration/ir-25-ils-2j/benchmark/" + instancesSets[set], ir25ils2j);
+        storeBenchmark("heuristic-calibration/ir-50-ils-j_2/benchmark/" + instancesSets[set], ir50ilsj2);
+        storeBenchmark("heuristic-calibration/ir-50-ils-j/benchmark/" + instancesSets[set], ir50ilsj);
+        storeBenchmark("heuristic-calibration/ir-50-ils-2j/benchmark/" + instancesSets[set], ir50ils2j);
 
         // output
         ofstream objOutput, timeOutput;
@@ -171,19 +181,37 @@ int main()
 
         for(int i = 0; i < numOfInstances; i++)
         {
-            objOutput << ir5ilsj[set][i].objVal << "\t"
-                << ir5ilsj2[set][i].objVal << "\t"
-                << ir10ilsj[set][i].objVal << "\t"
+            objOutput << ir5ilsj2[set][i].objVal << "\t"
+                << ir5ilsj[set][i].objVal << "\t"
+                << ir5ils2j[set][i].objVal << "\t"
                 << ir10ilsj2[set][i].objVal << "\t"
+                << ir10ilsj[set][i].objVal << "\t"
+                << ir10ils2j[set][i].objVal << "\t"
+                << ir15ilsj2[set][i].objVal << "\t"
                 << ir15ilsj[set][i].objVal << "\t"
-                << ir15ilsj2[set][i].objVal << endl;
+                << ir15ils2j[set][i].objVal << "\t"
+                << ir25ilsj2[set][i].objVal << "\t"
+                << ir25ilsj[set][i].objVal << "\t"
+                << ir25ils2j[set][i].objVal << "\t" 
+                << ir50ilsj2[set][i].objVal << "\t"
+                << ir50ilsj[set][i].objVal << "\t"
+                << ir50ils2j[set][i].objVal << endl;
 
-            timeOutput << ir5ilsj[set][i].time << "\t"
-                << ir5ilsj2[set][i].time << "\t"
-                << ir10ilsj[set][i].time << "\t"
+            timeOutput << ir5ilsj2[set][i].time << "\t"
+                << ir5ilsj[set][i].time << "\t"
+                << ir5ils2j[set][i].time << "\t"
                 << ir10ilsj2[set][i].time << "\t"
+                << ir10ilsj[set][i].time << "\t"
+                << ir10ils2j[set][i].time << "\t"
+                << ir15ilsj2[set][i].time << "\t"
                 << ir15ilsj[set][i].time << "\t"
-                << ir15ilsj2[set][i].time << endl;
+                << ir15ils2j[set][i].time << "\t"
+                << ir25ilsj2[set][i].time << "\t"
+                << ir25ilsj[set][i].time << "\t"
+                << ir25ils2j[set][i].time << "\t" 
+                << ir50ilsj2[set][i].time << "\t"
+                << ir50ilsj[set][i].time << "\t"
+                << ir50ils2j[set][i].time << endl;
         }
 
         objOutput.close();
