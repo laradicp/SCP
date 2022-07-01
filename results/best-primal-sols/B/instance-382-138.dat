@@ -1,4 +1,4 @@
-binary-heuristic-lb-algo-ub
+binary-heuristic-lb-trivial-ub
 Position 1:	226
 Position 2:	8
 Position 3:	17
@@ -363,4 +363,4 @@ Position 361:	232
 Position 362:	376
 Position 363:	189
 Maximum profit:	363
-Time:		27.3179
+Time:		30.9828

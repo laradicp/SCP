@@ -1,11 +1,11 @@
 heuristic
-Position 1:	28
-Position 2:	40
+Position 1:	0
+Position 2:	28
 Position 3:	41
-Position 4:	18
-Position 5:	0
+Position 4:	40
+Position 5:	42
 Position 6:	42
-Position 7:	42
+Position 7:	18
 Position 8:	1
 Maximum profit:	8
-Time:	1.508e-05
+Time:	3.2497e-05

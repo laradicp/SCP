@@ -1,4 +1,4 @@
-iterative-heuristic-lb
+binary-heuristic-lb-algo-ub
 Position 1:	219
 Position 2:	4
 Position 3:	368
@@ -340,4 +340,4 @@ Position 338:	367
 Position 339:	348
 Position 340:	325
 Maximum profit:	340
-Time:		78.8983
+Time:		93.1976
