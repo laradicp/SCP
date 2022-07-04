@@ -749,27 +749,21 @@ int heuristic(Data data, vector<int> &bestS)
         data = fullData;
 
         construction(currentBestS, data);
+
+        vector<int> s = currentBestS;
         int currentBestSSize = currentBestS.size();
         Data currentBestData = data;
+
+        if(currentBestSSize == data.getDimension())
+        {
+            bestS = currentBestS;
+            bestSSize = currentBestSSize;
+            break;
+        }
         
         int iterMax = data.getDimension()/2;
         for(int j = 0; j < iterMax; j++)
         {
-            vector<int> s = currentBestS;
-            data = currentBestData;
-
-            if(s.size() == data.getDimension())
-            {
-                break;
-            }
-            
-            perturbation(s, data, infeasibleSwapPos);
-            
-            if(s.size() == data.getDimension())
-            {
-                break;
-            }
-
             insertion(s, data);
             
             if(s.size() > currentBestSSize)
@@ -784,6 +778,16 @@ int heuristic(Data data, vector<int> &bestS)
             {
                 j++;
             }
+
+            if(s.size() == data.getDimension())
+            {
+                break;
+            }
+
+            s = currentBestS;
+            data = currentBestData;
+
+            perturbation(s, data, infeasibleSwapPos);
         }
 
         if(currentBestSSize > bestSSize)
