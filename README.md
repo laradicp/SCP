@@ -21,8 +21,9 @@ do so. This limit is 4 and 2 for sets C and D, respectively. Hence there is an i
 
 Different strategies were tested to solve this problem:
 
-- Feasibility checking using binary and iterative searches with trivial, combinatorial (here called "algorithm") and heuristic bounds;
-- Pure optimization model.
+- Feasibility checking using binary and iterative searches with trivial, combinatorial and heuristic bounds;
+- Optimization model based on jobs (F1);
+- Optimization model based on families of jobs to reduce symmetries (F2).
 
 ### Contributors
 - Lara di Cavalcanti Pontes
