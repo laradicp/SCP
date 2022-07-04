@@ -22,7 +22,7 @@ bool isInfeasible(vector<int> &s, Data &data)
                     }
                 }
 
-                if(data.cadenceType(c) == 1)
+                if(data.cadenceType(c) == 2)
                 {
                     if(sum > 1)
                     {
@@ -77,7 +77,7 @@ void construction(vector<int> &s, Data &data)
                         int begin = sSize - data.getCadence(c) > 0 ?
                                     sSize - data.getCadence(c) : 0;    
                         
-                        if(data.cadenceType(c) == 1)
+                        if(data.cadenceType(c) == 2)
                         {
                             for(int k = begin; k < sSize; k++)
                             {
@@ -145,7 +145,7 @@ void insertion(vector<int> &s, Data &data)
                         int begin = p - data.getCadence(c) > 0 ? p - data.getCadence(c) : 0;
                         int end = p + data.getCadence(c) < sSize ? p + data.getCadence(c) : sSize;
                         
-                        if(data.cadenceType(c) == 1)
+                        if(data.cadenceType(c) == 2)
                         {
                             for(int k = begin; k < end; k++)
                             {
@@ -227,7 +227,7 @@ void insertion(vector<int> &s, Data &data)
                         int begin = p - data.getCadence(c) > 0 ? p - data.getCadence(c) : 0;
                         int end = p + data.getCadence(c) < sSize ? p + data.getCadence(c) : sSize;
                         
-                        if(data.cadenceType(c) == 1)
+                        if(data.cadenceType(c) == 2)
                         {
                             for(int k = begin; k < end; k++)
                             {
@@ -341,7 +341,7 @@ void removalCL(vector<int> &s, Data &data, int beginSearch, int endSearch, list<
             int begin = p - data.getCadence(c) > 0 ? p - data.getCadence(c) : 0; 
             int end = p + data.getCadence(c) + 1 < sSize ? p + data.getCadence(c) + 1 : sSize;
 
-            if(data.cadenceType(c) == 1)
+            if(data.cadenceType(c) == 2)
             {
                 if(!data.getCadencesPerFamily(s[p], c)) // if s[p] has cadence c, there is no job with cadence c in the range
                 {
@@ -449,7 +449,7 @@ bool swapFeasibility(vector<int> &s, Data &data, int p1, int p2)
                 int begin = p2 - data.getCadence(c) > 0 ? p2 - data.getCadence(c) : 0;
                 int end = p2 + data.getCadence(c) + 1 < sSize ? p2 + data.getCadence(c) + 1 : sSize;
 
-                if(data.cadenceType(c) == 1)
+                if(data.cadenceType(c) == 2)
                 {
                     if(p1 > begin)
                     {
@@ -532,7 +532,7 @@ bool swapFeasibility(vector<int> &s, Data &data, int p1, int p2)
                 int begin = p1 - data.getCadence(c) > 0 ? p1 - data.getCadence(c) : 0;
                 int end = p1 + data.getCadence(c) + 1 < sSize ? p1 + data.getCadence(c) + 1 : sSize;
 
-                if(data.cadenceType(c) == 1)
+                if(data.cadenceType(c) == 2)
                 {
                     if(p2 < end)
                     {

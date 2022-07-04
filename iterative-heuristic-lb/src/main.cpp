@@ -88,11 +88,11 @@ bool solve(Data &data, int positions, std::vector<int> &s, double time)
     std::vector<bool> satisfied(data.getCadencesSize(), false);
     for(int c = 0; c < data.getCadencesSize(); c++)
     {
-        if(data.cadenceType(c) == 1)
+        if(data.cadenceType(c) == 2)
         {
             for(int c2 = 0; c2 < data.getCadencesSize(); c2++)
             {
-                if(data.cadenceType(c) == 2)
+                if(data.cadenceType(c) == 1)
                 {
                     if((jobsPerCadence[c] - intersect[c][c2] + std::ceil(data.getCadence(c)/(data.getCadence(c2) + 1)) <
                         data.getCadence(c))&&(intersect[c][c2]*data.getCadence(c2) >= data.getCadence(c)))
@@ -110,7 +110,7 @@ bool solve(Data &data, int positions, std::vector<int> &s, double time)
     {
         for(int c = 0; c < data.getCadencesSize(); c++)
         {
-            if(data.cadenceType(c) == 1)
+            if(data.cadenceType(c) == 2)
             {
                 if(satisfied[c])
                 {
@@ -151,7 +151,7 @@ bool solve(Data &data, int positions, std::vector<int> &s, double time)
     {
         for(int c = 0; c < data.getCadencesSize(); c++)
         {
-            if(data.cadenceType(c) == 2)
+            if(data.cadenceType(c) == 1)
             {
                 IloExpr sumX(env);
 
@@ -314,11 +314,11 @@ bool solve2(Data &data, std::vector<int> &s)
     std::vector<bool> satisfied(data.getCadencesSize(), false);
     for(int c = 0; c < data.getCadencesSize(); c++)
     {
-        if(data.cadenceType(c) == 1)
+        if(data.cadenceType(c) == 2)
         {
             for(int c2 = 0; c2 < data.getCadencesSize(); c2++)
             {
-                if(data.cadenceType(c) == 2)
+                if(data.cadenceType(c) == 1)
                 {
                     if((jobsPerCadence[c] - intersect[c][c2] + std::ceil(data.getCadence(c)/(data.getCadence(c2) + 1)) <
                         data.getCadence(c))&&(intersect[c][c2]*data.getCadence(c2) >= data.getCadence(c)))
@@ -336,7 +336,7 @@ bool solve2(Data &data, std::vector<int> &s)
     {
         for(int c = 0; c < data.getCadencesSize(); c++)
         {
-            if(data.cadenceType(c) == 1)
+            if(data.cadenceType(c) == 2)
             {
                 if(satisfied[c])
                 {
@@ -377,7 +377,7 @@ bool solve2(Data &data, std::vector<int> &s)
     {
         for(int c = 0; c < data.getCadencesSize(); c++)
         {
-            if(data.cadenceType(c) == 2)
+            if(data.cadenceType(c) == 1)
             {
                 IloExpr sumX(env);
 

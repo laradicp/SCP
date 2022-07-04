@@ -104,15 +104,15 @@ int Data::cadenceType(int c)
 {
     if(cadences[c].first > 1)
     {
-        return 2;
+        return 1;
     }
     
-    return 1;
+    return 2;
 }
 
 int Data::getCadence(int c)
 {
-    if(cadenceType(c) == 1)
+    if(cadenceType(c) == 2)
     {
         return cadences[c].second;
     }

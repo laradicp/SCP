@@ -128,15 +128,15 @@ int Data::cadenceType(int c)
 {
     if(cadences[c].first > 1)
     {
-        return 2;
+        return 1;
     }
     
-    return 1;
+    return 2;
 }
 
 int Data::getCadence(int c)
 {
-    if(cadenceType(c) == 1)
+    if(cadenceType(c) == 2)
     {
         return cadences[c].second;
     }
@@ -345,7 +345,7 @@ void Data::calculateLB(int i, std::vector<int> &s, std::vector<double> &score, s
                         int begin = p - getCadence(c) > 0 ? p - getCadence(c) : 0;
                         int end = p + getCadence(c) < sSize ? p + getCadence(c) : sSize;
                         
-                        if(cadenceType(c) == 1)
+                        if(cadenceType(c) == 2)
                         {
                             for(int k = begin; k < end; k++)
                             {
@@ -444,7 +444,7 @@ std::vector<int> Data::getLowerBoundSol()
     // Set scores
     for(int i = 1; i < getCadencesSize() + 1; i++)
     {
-        if(cadenceType(i - 1) == 1)
+        if(cadenceType(i - 1) == 2)
         {
             score[i] = getCadence(i - 1);
         }
