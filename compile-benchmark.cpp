@@ -153,10 +153,10 @@ struct OptimalInfo{
 int main()
 {
     vector<string> versions{"al", "hl", "au", "balau", "baltu", "bhlau", "bhltu", "btlau", "btltu", "ial", "ihl", "itl", "iau", "itu", "f1", "f2"},
-        folders{"", "heuristic/output/", "", "binary-algo-lb-algo-ub/benchmark/", "binary-algo-lb-trivial-ub/benchmark/", 
-        "binary-heuristic-lb-algo-ub/benchmark/", "binary-heuristic-lb-trivial-ub/benchmark/", "binary-trivial-lb-algo-ub/benchmark/",
-        "binary-trivial-lb-trivial-ub/benchmark/", "iterative-algo-lb/benchmark/", "iterative-heuristic-lb/benchmark/",
-        "iterative-trivial-lb/benchmark/", "iterative-algo-ub/benchmark/", "iterative-trivial-ub/benchmark/", "f1/benchmark/", "f2/benchmark/"},
+        folders{"", "heuristic/output/", "", "binary-comb-lb-comb-ub/benchmark/", "binary-comb-lb-trivial-ub/benchmark/", 
+        "binary-heuristic-lb-comb-ub/benchmark/", "binary-heuristic-lb-trivial-ub/benchmark/", "binary-trivial-lb-comb-ub/benchmark/",
+        "binary-trivial-lb-trivial-ub/benchmark/", "iterative-comb-lb/benchmark/", "iterative-heuristic-lb/benchmark/",
+        "iterative-trivial-lb/benchmark/", "iterative-comb-ub/benchmark/", "iterative-trivial-ub/benchmark/", "f1/benchmark/", "f2/benchmark/"},
         instancesSets = {"A", "B", "C", "D"};
     vector<vector<vector<vector<pair<double, int>>>>> matrixObjTime(16,
         vector<vector<vector<pair<double, int>>>>(4, vector<vector<pair<double, int>>>(2,
