@@ -25,6 +25,10 @@ Different strategies were tested to solve this problem:
 - Optimization model based on jobs (F1);
 - Optimization model based on families of jobs to reduce symmetries (F2).
 
+### Results
+
+The detailed results can be found in the folder "results".
+
 ### Contributors
 - Lara di Cavalcanti Pontes
 - Carlos Vinícius Costa Neves (https://github.com/cvneves)
